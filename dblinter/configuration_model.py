@@ -4,6 +4,7 @@ Contain the definition of data model for parsing the configuration file.
 In our case, we use
 basemodel, so this module contains Pydantic schema.
 """
+
 # pylint: disable=no-name-in-module
 # pylint: disable=no-self-argument
 
