@@ -285,7 +285,7 @@ def dblinter(
     uri = f"postgresql://{user}:{password}@{host}:{port}/{dbname}?sslmode={sslmode}"
     try:
         db = DatabaseConnection(uri)
-    except (psycopg2.OperationalError) as error:
+    except psycopg2.OperationalError as error:
         rprint("[red]Error connecting to db: [/red]")
         raise error
 
