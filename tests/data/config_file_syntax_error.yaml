@@ -1,0 +1,6 @@
+cluster:
+  - name: MaxConnectionsByWorkMemIsNotLargerThanMemory
+      weight: "100"
+    params: [12,"toto"]
+    -
+      -

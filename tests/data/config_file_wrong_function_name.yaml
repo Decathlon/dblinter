@@ -1,0 +1,113 @@
+cluster:
+  - name: MaxConnectionsByWorkMemIsNotLargerThanMemory_wrong_name
+    enabled: True
+    params:
+      - ram: 4000000000
+    context:
+      desc: Number of cx (max_connections * work_mem) is not greater than memory.
+      fixes:
+        - downsize max_connections or upsize memory
+base:
+  - name: HowManyTableWithoutPrimaryKey
+    enabled: True
+    params:
+      - warning: 10%
+      - error: 70%
+    context:
+      desc: Count number of tables without primary key.
+      fixes:
+        - create a primary key or change warning/error threshold.
+  - name: HowManyTableWithoutIndexOnFk
+    enabled: True
+    params:
+      - warning: 10%
+      - error: 70%
+    context:
+      desc: Count number of tables without index on foreign key.
+      fixes:
+        - create a index on foreign key or change warning/error threshold.
+  - name: HowManyRedudantIndex
+    enabled: True
+    params:
+      - warning: 5%
+      - error: 50%
+    context:
+      desc: Count number of redundant index vs nb index.
+      fixes:
+        - remove duplicated index or change warning/error threshold.
+  - name: HowManyUnusedIndex
+    enabled: True
+    params:
+      - warning: 5%
+      - error: 50%
+      - size_mo: 250
+    context:
+      desc: Count number of unused index vs nb index (base on pg_stat_user_indexes, indexes associated to unique constraints are discard.)
+      fixes:
+        - remove unused index or change warning/error threshold.
+table:
+  - name: TableWithoutPrimaryKey
+    enabled: True
+    context:
+      desc: table without primary key.
+      fixes:
+        - create a primary key.
+  - name: TableWithoutIndex_wrong_name
+    enabled: True
+    context:
+      desc: table without index.
+      fixes:
+        - check if it's necessary to create index.
+  - name: TableWithRedundantIndex
+    enabled: True
+    context:
+      desc: table without duplicated index.
+      fixes:
+        - remove duplicated index
+  - name: TableWithFkNotIndexed
+    enabled: True
+    context:
+      desc: table without index on fk.
+      fixes:
+        - index foreign key.
+  - name: TableWithFkOutsideSchema
+    enabled: True
+    context:
+      desc: table with fk outside its schema
+      fixes:
+        - consider rewrite your model, ask a dba.
+  - name: TableWithFkMismatch
+    enabled: True
+    context:
+      desc: table with fk mismatch, ex smallint refer to a bigint
+      fixes:
+        - consider rewrite your model, ask a dba.
+  - name: TableWithPotentialMissingIdx
+    enabled: True
+    params:
+      - threshold: 1000000
+    context:
+      desc: table with high level of seq scan vs idx scan, base on pg_stat_user_tables.
+      fixes:
+        - ask a dba.
+  - name: TableWithUnusedIndex
+    enabled: True
+    params:
+      - size_mo: 25
+    context:
+      desc: Table unused index, base on pg_stat_user_indexes, indexes associated to unique constraints are discard.
+      fixes:
+        - remove unused index or change warning/error threshold.
+  - name: TableWithRoleNotGranted
+    enabled: True
+    context:
+      desc: Table has no roles grantee. Meaning that users will need direct access on it (not through a role).
+      fixes:
+        - create roles (myschema_ro & myschema_rw) and grant it on table with appropriate privileges.
+schema:
+  - name: SchemaWithDefaultRoleNotGranted
+    enabled: True
+    context:
+      desc: The schema ha no default role. Means that futur table will not be granted through a role. So you will have to re-execute grants on it.
+      fixes:
+        - add a default privilege=> ALTER DEFAULT PRIVILEGES IN SCHEMA <schema> for user <schema's owner> GRANT SELECT ON TABLES TO <schema>_read_only

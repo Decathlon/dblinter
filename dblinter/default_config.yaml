@@ -1,0 +1,181 @@
+cluster:
+  - name: MaxConnectionsByWorkMemIsNotLargerThanMemory
+    ruleid: C001
+    enabled: True
+    params:
+      - ram: 4000000000
+    context:
+      desc: Number of cx (max_connections * work_mem) is not greater than memory.
+      message: "work_mem * max_connections is bigger than ram."
+      fixes:
+        - downsize max_connections or upsize memory.
+base:
+  - name: HowManyTableWithoutPrimaryKey
+    ruleid: B001
+    enabled: True
+    params:
+      - warning: 10%
+      - error: 70%
+    context:
+      desc: Count number of tables without primary key.
+      message: "{0} table without primary key exceed the warning threshold: {1}%."
+      fixes:
+        - create a primary key or change warning/error threshold.
+  - name: HowManyRedudantIndex
+    ruleid: B002
+    enabled: True
+    params:
+      - warning: 5%
+      - error: 50%
+    context:
+      desc: Count number of redundant index vs nb index.
+      message: "{0} redundant(s) index exceed the warning threshold: {1}%."
+      fixes:
+        - remove duplicated index or change warning/error threshold.
+  - name: HowManyTableWithoutIndexOnFk
+    ruleid: B003
+    enabled: True
+    params:
+      - warning: 10%
+      - error: 70%
+    context:
+      desc: Count number of tables without index on foreign key.
+      message: "{0} table without index on foreign key exceed the warning threshold: {1}%."
+      fixes:
+        - create a index on foreign key or change warning/error threshold.
+  - name: HowManyUnusedIndex
+    ruleid: B004
+    enabled: True
+    params:
+      - warning: 5%
+      - error: 50%
+      - size_mo: 250
+    context:
+      desc: Count number of unused index vs nb index (base on pg_stat_user_indexes, indexes associated to unique constraints are discard.)
+      message: "{0} table(s) with unused index exceed the warning threshold: {1}%."
+      fixes:
+        - remove unused index or change warning/error threshold.
+  - name: UnsecuredPublicSchema
+    ruleid: B005
+    enabled: True
+    context:
+      desc: Only authorized users should be allowed to create new objects.
+      message: "All schemas on search_path are unsecured, all users can create objects."
+      fixes:
+        - REVOKE CREATE ON SCHEMA public FROM PUBLIC
+  - name: HowManyTablesWithUppercase
+    ruleid: B006
+    enabled: True
+    params:
+      - warning: 10%
+      - error: 70%
+    context:
+      desc: Count number of tables with uppercase in name or in columns.
+      message: "{0} tables using uppercase for name or columns exceed the warning threshold: {1}%."
+      fixes:
+        - Do not use uppercase for any database objects
+table:
+  - name: TableWithoutPrimaryKey
+    ruleid: T001
+    enabled: True
+    context:
+      desc: table without primary key.
+      message: "No primary key on table {0}.{1}.{2}."
+      fixes:
+        - create a primary key.
+  - name: TableWithoutIndex
+    ruleid: T002
+    enabled: True
+    context:
+      desc: table without index.
+      message: "No index on table {0}.{1}.{2}."
+      fixes:
+        - check if it's necessary to create index.
+  - name: TableWithRedundantIndex
+    ruleid: T003
+    enabled: True
+    context:
+      desc: table without duplicated index.
+      message: "{0} redundant(s) index found on {1}.{2} idx {3} column {4}."
+      fixes:
+        - remove duplicated index
+  - name: TableWithFkNotIndexed
+    ruleid: T004
+    enabled: True
+    context:
+      desc: table without index on fk.
+      message: "unindexed fk {0}.{1}.{2} ddl:{3}."
+      fixes:
+        - index foreign key.
+  - name: TableWithPotentialMissingIdx
+    ruleid: T005
+    enabled: True
+    params:
+      - threshold: 1000000
+    context:
+      desc: table with high level of seq scan vs idx scan, base on pg_stat_user_tables.
+      message: "{0} table with seq scan exceed the threshold: {1}."
+      fixes:
+        - ask a dba.
+  - name: TableWithFkOutsideSchema
+    ruleid: T006
+    enabled: True
+    context:
+      desc: table with fk outside its schema
+      message: "fk {0} on {1} is in schema {2}."
+      fixes:
+        - consider rewrite your model.
+        - ask a dba.
+  - name: TableWithUnusedIndex
+    ruleid: T007
+    enabled: True
+    params:
+      - size_mo: 25
+    context:
+      desc: Table unused index, base on pg_stat_user_indexes, indexes associated to unique constraints are discard.
+      message: "Index {0} on {1} size {2} Mo seems to be unused (idx_scan=0)."
+      fixes:
+        - remove unused index or change warning/error threshold.
+  - name: TableWithFkMismatch
+    ruleid: T008
+    enabled: True
+    context:
+      desc: table with fk mismatch, ex smallint refer to a bigint
+      message: "Type constraint mismatch: {0} on {1} column {2} (type {3}/{4}) ref {5} column {6} type ({7}/{8})."
+      fixes:
+        - consider rewrite your model.
+        - ask a dba.
+  - name: TableWithRoleNotGranted
+    ruleid: T009
+    enabled: True
+    context:
+      desc: Table has no roles grantee. Meaning that users will need direct access on it (not through a role).
+      message: "No role grantee on table {0}.{1}.{2}. It means that except owner. Others will need a direct grant on this table, not through a role (unusual at dkt)."
+      fixes:
+        - create roles (myschema_ro & myschema_rw) and grant it on table with appropriate privileges.
+  - name: ReservedKeyWord
+    ruleid: T010
+    enabled: True
+    context:
+      desc: A table, his column or indexes use reserved keywords.
+      message: "{0} {1}.{2}.{3}.{4} violate retricted keyword rule."
+      fixes:
+        - Rename the object to use a non reserved keyword.
+  - name: TableWithUppercase
+    ruleid: T011
+    enabled: True
+    context:
+      desc: Table with uppercase in name or in columns.
+      message: "Uppercase used on table {0}.{1}.{2}."
+      fixes:
+        - Do not use uppercase for any database objects
+schema:
+  - name: SchemaWithDefaultRoleNotGranted
+    ruleid: S001
+    enabled: True
+    context:
+      desc: The schema ha no default role. Means that futur table will not be granted through a role. So you will have to re-execute grants on it.
+      message: "No default role grantee on schema {0}.{1}. It means that each time a table is created, you must grant it to roles."
+      fixes:
+        - "add a default privilege=> ALTER DEFAULT PRIVILEGES IN SCHEMA <schema> for user <schema's owner>"
+

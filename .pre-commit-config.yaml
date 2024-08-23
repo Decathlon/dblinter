@@ -1,0 +1,37 @@
+# See https://pre-commit.com/ for usage and config
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.3.0
+  hooks:
+  - id: check-yaml # Validates YAML files
+- repo: local
+  hooks:
+  - id: isort
+    name: isort
+    stages: [commit]
+    language: system
+    entry: poetry run isort --profile black .
+    types: [python]
+
+  - id: black
+    name: black
+    stages: [commit]
+    language: system
+    entry: poetry run black .
+    types: [python]
+
+  - id: ruff
+    name: ruff
+    stages: [commit]
+    language: system
+    types: [python]
+    entry: poetry run ruff .
+
+  - id: pylint
+    name: pylint
+    stages: [commit]
+    language: system
+    types: [python]
+    entry: poetry run pylint dblinter tests
+    require_serial: true
+

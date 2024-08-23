@@ -1,0 +1,32 @@
+name: Build and test
+
+on:
+    pull_request: { }
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        timeout-minutes: 60
+        steps:
+            -   uses: actions/checkout@v4
+                id: checkout
+
+            -   name: Setup Python
+                uses: actions/setup-python@v4
+                with:
+                    python-version: 3.12
+
+            -   name: Install dependencies with poetry
+                run: |
+                    sudo apt update
+                    sudo apt install postgresql-server-dev-16
+                    pip install poetry
+            -   run: poetry install --with dev
+            -   run: poetry run isort --profile black --diff .
+            -   run: poetry run black --check .
+            -   run: poetry run ruff check .
+            -   run: poetry run pylint dblinter tests
+            -   run: poetry run pytest --cov=dblinter --cov-report=xml --cov-branch --cov-report term-missing
+
+            -   name: Upload results to Codecov
+                uses: codecov/codecov-action@v4

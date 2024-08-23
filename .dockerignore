@@ -1,0 +1,10 @@
+# Ignore everything
+**
+
+# ... except for dependencies and source
+!pyproject.toml
+!poetry.lock
+!dblinter
+!setup.cfg
+!setup.py
+!README.md
