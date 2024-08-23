@@ -49,6 +49,8 @@ docker run --rm  decathlon/dblinter:latest  --dbname $PGDATABASE --host $PGHOST 
 
 ```
 
+
+
 ## Contributing
 
 We welcome contributions from the community. For more details on contributing to the project (including requirements), please refer to "[Getting Started with Contributing](CONTRIBUTING.md)."
