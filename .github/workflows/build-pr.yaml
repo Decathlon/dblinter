@@ -19,7 +19,7 @@ jobs:
             -   name: Install dependencies with poetry
                 run: |
                     sudo apt update
-                    sudo apt install postgresql-server-dev-16
+                    sudo apt install libpq-dev
                     pip install poetry
             -   run: poetry install --with dev
             -   run: poetry run isort --profile black --diff .
