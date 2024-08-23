@@ -1,18 +1,18 @@
-name: Build and push to Docker Hub image latest
+name: release version
 
 on:
-    push:
-        branches:
-            - main
-
-concurrency:
-    group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-    cancel-in-progress: true
+  release:
+    types:
+      - published
 
 jobs:
     build:
         runs-on: ubuntu-latest
         timeout-minutes: 60
+        environment: release
+        permissions:
+            contents: read
+            id-token: write
         steps:
             -   uses: actions/checkout@v4
                 id: checkout
@@ -27,17 +27,16 @@ jobs:
                     sudo apt update
                     sudo apt install libpq-dev
                     pip install poetry
-            -   run: poetry install --with dev
-            -   run: poetry run isort --profile black --diff .
-            -   run: poetry run black --check .
-            -   run: poetry run ruff check .
-            -   run: poetry run pylint dblinter tests
-            -   run: poetry run pytest --cov=dblinter --cov-report=xml --cov-branch --cov-report term-missing
 
-            -   name: Upload results to Codecov
-                uses: codecov/codecov-action@v4
-                with:
-                    token: ${{ secrets.CODECOV_TOKEN }}
+            -   name: Create package
+                shell: bash
+                run: |
+                    sed -i "s/0.0.0/${{ github.event.release.tag_name }}/" dblinter/__init__.py
+                    sed -i "s/0.0.0/${{ github.event.release.tag_name }}/" pyproject.toml
+                    poetry build
+
+            -   name: Publish package
+                uses: pypa/gh-action-pypi-publish@release/v1
 
             -   name: Login to Docker Hub
                 uses: docker/login-action@v3
@@ -49,4 +48,4 @@ jobs:
                 uses: docker/build-push-action@v6
                 with:
                     push: true
-                    tags: decathlon/dblinter:latest
+                    tags: decathlon/dblinter:${{ github.event.release.tag_name }}
