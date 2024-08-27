@@ -88,7 +88,7 @@ def main(
         user=user,
         password=password,
         port=port,
-        sslmode=sslmode,
+        sslmode=sslmode.value,
         describe=describe,
         filename=filename,
         append=append,
