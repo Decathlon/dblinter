@@ -3,6 +3,7 @@ from testcontainers.postgres import PostgresContainer
 from dblinter.configuration_model import Context
 from dblinter.sarif_document import SarifDocument
 from dblinter.scan import dblinter
+from dblinter import __version__
 
 
 def test_init_sarif_document():
@@ -21,7 +22,7 @@ def test_add_run_information():
         sd.sarif_doc.runs[0].tool.driver.information_uri
         == "https://github.com/decathlon/dblinter"
     )
-    assert sd.sarif_doc.runs[0].tool.driver.version == "0.1.14"
+    assert sd.sarif_doc.runs[0].tool.driver.version == __version__
 
 
 def test_add_check():
@@ -55,7 +56,7 @@ def test_json_format():
     js = sd.json_format()
     assert (
         js
-        == '{\n  "runs": [\n    {\n      "tool": {\n        "driver": {\n          "name": "dblinter",\n          "version": "0.1.14",\n          "informationUri": "https://github.com/decathlon/dblinter"\n        }\n      },\n      "invocations": [\n        {\n          "executionSuccessful": true\n        }\n      ],\n      "results": []\n    }\n  ],\n  "version": "2.1.0",\n  "$schema": "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json"\n}'
+        == '{\n  "runs": [\n    {\n      "tool": {\n        "driver": {\n          "name": "dblinter",\n          "version": "0.0.0",\n          "informationUri": "https://github.com/decathlon/dblinter"\n        }\n      },\n      "invocations": [\n        {\n          "executionSuccessful": true\n        }\n      ],\n      "results": []\n    }\n  ],\n  "version": "2.1.0",\n  "$schema": "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json"\n}'
     )
 
 

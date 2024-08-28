@@ -104,9 +104,9 @@ table:
     enabled: True
     context:
       desc: table without index on fk.
-      message: "unindexed fk {0}.{1}.{2} ddl:{3}."
+      message: "unindexed fk {0}.{1}.{2}."
       fixes:
-        - index foreign key.
+        - "{3}."
   - name: TableWithPotentialMissingIdx
     ruleid: T005
     enabled: True
