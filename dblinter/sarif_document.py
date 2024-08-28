@@ -15,6 +15,7 @@ from sarif_om import (
     Tool,
     ToolComponent,
 )
+
 from dblinter import __version__
 
 LOGGER = logging.getLogger("dblinter")
@@ -23,6 +24,7 @@ VERSION = "2.1.0"
 SCHEMA = "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json"
 RICH_RULE_MESSAGE_COLOR = "red"
 RICH_RULE_FIX_COLOR = "bright_white"
+
 
 class SarifDocument:
     """Construct the sarif document
@@ -87,7 +89,7 @@ class SarifDocument:
         message = context.message
         if message is not None:
             message = message.format(*message_args)
-        if context.fixes is not None :
+        if context.fixes is not None:
             formated_fixes = [fix.format(*message_args) for fix in context.fixes]
         sarif_result = Result(
             rule_id=ruleid,
@@ -99,10 +101,30 @@ class SarifDocument:
         self.sarif_doc.runs[0].invocations[0].end_time_utc = datetime.now(timezone.utc)
 
         if self.quiet_mode is False:
-            rprint("["+RICH_RULE_MESSAGE_COLOR+"]  ⚠ - "+ruleid+" "+uri+" "+message+"[/"+RICH_RULE_MESSAGE_COLOR+"]")
+            rprint(
+                "["
+                + RICH_RULE_MESSAGE_COLOR
+                + "]  ⚠ - "
+                + ruleid
+                + " "
+                + uri
+                + " "
+                + message
+                + "[/"
+                + RICH_RULE_MESSAGE_COLOR
+                + "]"
+            )
             if context.fixes:
                 for fix in formated_fixes:
-                    rprint("["+RICH_RULE_FIX_COLOR+"]    ↪ Fix:  "+fix+"[/"+RICH_RULE_FIX_COLOR+"]")
+                    rprint(
+                        "["
+                        + RICH_RULE_FIX_COLOR
+                        + "]    ↪ Fix:  "
+                        + fix
+                        + "[/"
+                        + RICH_RULE_FIX_COLOR
+                        + "]"
+                    )
 
     def json_format(self):
         """Tranform a sarif_om object into json

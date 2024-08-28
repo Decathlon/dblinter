@@ -30,7 +30,9 @@ def perform_cluster_check(function_library, db, config_file, sarif_document):
         sarif_document (SarifDocument): Sarif Document
     """
     if sarif_document.quiet_mode is False:
-        rprint("["+RICH_CHECK_COLOR+"]perform_cluster_check[/"+RICH_CHECK_COLOR+"]")
+        rprint(
+            "[" + RICH_CHECK_COLOR + "]perform_cluster_check[/" + RICH_CHECK_COLOR + "]"
+        )
     for check in config_file.cluster_checks:
         function_to_launch = function_library.get_function_by_config_name(check.name)
         if function_to_launch:
@@ -54,7 +56,15 @@ def perform_base_check(function_library, db, config_file, sarif_document):
     """
     # LOGGER.info(rprint(f"[green]perform_base_check for {db.database}[/green]"))
     if sarif_document.quiet_mode is False:
-        rprint("["+RICH_CHECK_COLOR+"]perform_base_check for " + db.database + "[/"+RICH_CHECK_COLOR+"]")
+        rprint(
+            "["
+            + RICH_CHECK_COLOR
+            + "]perform_base_check for "
+            + db.database
+            + "[/"
+            + RICH_CHECK_COLOR
+            + "]"
+        )
     for check in config_file.base_checks:
         function_to_launch = function_library.get_function_by_config_name(check.name)
         if function_to_launch:
@@ -77,7 +87,15 @@ def perform_schema_check(function_library, db, config_file, sarif_document, sche
         sarif_document (SarifDocument): Sarif Document
     """
     if sarif_document.quiet_mode is False:
-        rprint("["+RICH_CHECK_COLOR+"]perform_schema_check for " + db.database + "[/"+RICH_CHECK_COLOR+"]")
+        rprint(
+            "["
+            + RICH_CHECK_COLOR
+            + "]perform_schema_check for "
+            + db.database
+            + "[/"
+            + RICH_CHECK_COLOR
+            + "]"
+        )
     qry = f"""SELECT schema_name
         FROM information_schema.schemata pt
         WHERE schema_name NOT IN ('pg_toast', 'pg_catalog', 'information_schema','public')
@@ -90,13 +108,17 @@ def perform_schema_check(function_library, db, config_file, sarif_document, sche
         # LOGGER.info(rprint(f"[green]perform_schema_check for {str(i)}/{str(len(schema_list))} {oneschema[0]}[/green]"))
         if sarif_document.quiet_mode is False:
             rprint(
-                "["+RICH_CHECK_COLOR+"]perform_schema_check "
+                "["
+                + RICH_CHECK_COLOR
+                + "]perform_schema_check "
                 + str(i)
                 + "/"
                 + str(len(schema_list))
                 + " "
                 + oneschema[0]
-                + "[/"+RICH_CHECK_COLOR+"]"
+                + "[/"
+                + RICH_CHECK_COLOR
+                + "]"
             )
         i = i + 1
         for check in config_file.schema_checks:
@@ -128,7 +150,15 @@ def perform_table_check(
     # list table from the database
     # LOGGER.info(rprint(f"[green]perform_table_check for {db.database}[/green]"))
     if sarif_document.quiet_mode is False:
-        rprint("["+RICH_CHECK_COLOR+"]perform_table_check for " + db.database + "[/"+RICH_CHECK_COLOR+"]")
+        rprint(
+            "["
+            + RICH_CHECK_COLOR
+            + "]perform_table_check for "
+            + db.database
+            + "[/"
+            + RICH_CHECK_COLOR
+            + "]"
+        )
     qry = f"""SELECT schemaname, tablename
     FROM pg_catalog.pg_tables pt WHERE schemaname NOT IN ('pg_toast', 'pg_catalog', 'information_schema')
     AND (schemaname = '{schema}' or '{schema}'='')
@@ -140,7 +170,9 @@ def perform_table_check(
         # LOGGER.info(rprint(f"[green]perform_table_check for {str(i)}/{str(len(table_list))} {table[0]}.{table[0]}[/green]"))
         if sarif_document.quiet_mode is False:
             rprint(
-                "["+RICH_CHECK_COLOR+"]perform_table_check "
+                "["
+                + RICH_CHECK_COLOR
+                + "]perform_table_check "
                 + str(i)
                 + "/"
                 + str(len(table_list))
@@ -148,7 +180,9 @@ def perform_table_check(
                 + table[0]
                 + "."
                 + table[1]
-                + "[/"+RICH_CHECK_COLOR+"]"
+                + "[/"
+                + RICH_CHECK_COLOR
+                + "]"
             )
         i = i + 1
         for check in config_file.table_checks:

@@ -1,9 +1,9 @@
 from testcontainers.postgres import PostgresContainer
 
+from dblinter import __version__
 from dblinter.configuration_model import Context
 from dblinter.sarif_document import SarifDocument
 from dblinter.scan import dblinter
-from dblinter import __version__
 
 
 def test_init_sarif_document():
