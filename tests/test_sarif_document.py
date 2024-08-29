@@ -48,7 +48,44 @@ def test_add_check():
         .physical_location.artifact_location.uri
         == "cluster"
     )
+    assert sd.sarif_doc.runs[0].results[0].fixes[0] == "downsize max_connections or upsize memory."
 
+def test_add_check_output(capsys):
+    sd = SarifDocument()
+    context = Context(
+        desc="Number of cx (max_connections * work_mem) is not greater than memory.",
+        message="work_mem * max_connections is bigger than ram.",
+        fixes=[
+            "downsize max_connections or upsize memory.",
+        ],
+    )
+    sd.add_check("C001", (), "cluster", context)
+    captured = capsys.readouterr()
+    assert captured.out == '  ⚠ - C001 cluster work_mem * max_connections is bigger than ram.\n    ↪ Fix:  downsize max_connections or upsize memory.\n'
+
+def test_add_check_output_no_fix(capsys):
+    sd = SarifDocument()
+    context = Context(
+        desc="Number of cx (max_connections * work_mem) is not greater than memory.",
+        message="work_mem * max_connections is bigger than ram.",
+        fixes=[],
+    )
+    sd.add_check("C001", (), "cluster", context)
+    captured = capsys.readouterr()
+    assert captured.out == '  ⚠ - C001 cluster work_mem * max_connections is bigger than ram.\n'
+
+def test_add_check_output_no_message(capsys):
+    sd = SarifDocument()
+    context = Context(
+        desc="Number of cx (max_connections * work_mem) is not greater than memory.",
+        message=None,
+        fixes=[
+            "downsize max_connections or upsize memory.",
+        ],
+    )
+    sd.add_check("C001", (), "cluster", context)
+    captured = capsys.readouterr()
+    assert captured.out == ""
 
 def test_json_format():
     sd = SarifDocument()
