@@ -1,5 +1,6 @@
 from testcontainers.postgres import PostgresContainer
 
+from dblinter import __version__
 from dblinter.configuration_model import Context
 from dblinter.sarif_document import SarifDocument
 from dblinter.scan import dblinter
@@ -21,7 +22,7 @@ def test_add_run_information():
         sd.sarif_doc.runs[0].tool.driver.information_uri
         == "https://github.com/decathlon/dblinter"
     )
-    assert sd.sarif_doc.runs[0].tool.driver.version == "0.1.14"
+    assert sd.sarif_doc.runs[0].tool.driver.version == __version__
 
 
 def test_add_check():
@@ -47,6 +48,59 @@ def test_add_check():
         .physical_location.artifact_location.uri
         == "cluster"
     )
+    assert (
+        sd.sarif_doc.runs[0].results[0].fixes[0]
+        == "downsize max_connections or upsize memory."
+    )
+
+
+def test_add_check_output(capsys):
+    sd = SarifDocument()
+    context = Context(
+        desc="Number of cx (max_connections * work_mem) is not greater than memory.",
+        message="work_mem * max_connections is bigger than ram.",
+        fixes=[
+            "downsize max_connections or upsize memory.",
+        ],
+    )
+    sd.add_check("C001", (), "cluster", context)
+    captured = capsys.readouterr()
+    assert (
+        captured.out
+        == "  ⚠ - C001 cluster work_mem * max_connections is bigger than ram.\n    ↪ Fix:  downsize max_connections or upsize memory.\n"
+    )
+
+
+def test_add_check_output_no_fix(capsys):
+    sd = SarifDocument()
+    context = Context(
+        desc="Number of cx (max_connections * work_mem) is not greater than memory.",
+        message="work_mem * max_connections is bigger than ram.",
+        fixes=[],
+    )
+    sd.add_check("C001", (), "cluster", context)
+    captured = capsys.readouterr()
+    assert (
+        captured.out
+        == "  ⚠ - C001 cluster work_mem * max_connections is bigger than ram.\n"
+    )
+
+
+def test_add_check_output_no_message(capsys):
+    sd = SarifDocument()
+    context = Context(
+        desc="Number of cx (max_connections * work_mem) is not greater than memory.",
+        message=None,
+        fixes=[
+            "downsize max_connections or upsize memory.",
+        ],
+    )
+    sd.add_check("C001", (), "cluster", context)
+    captured = capsys.readouterr()
+    assert (
+        captured.out
+        == "  ⚠ - C001 cluster \n    ↪ Fix:  downsize max_connections or upsize memory.\n"
+    )
 
 
 def test_json_format():
@@ -55,7 +109,7 @@ def test_json_format():
     js = sd.json_format()
     assert (
         js
-        == '{\n  "runs": [\n    {\n      "tool": {\n        "driver": {\n          "name": "dblinter",\n          "version": "0.1.14",\n          "informationUri": "https://github.com/decathlon/dblinter"\n        }\n      },\n      "invocations": [\n        {\n          "executionSuccessful": true\n        }\n      ],\n      "results": []\n    }\n  ],\n  "version": "2.1.0",\n  "$schema": "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json"\n}'
+        == '{\n  "runs": [\n    {\n      "tool": {\n        "driver": {\n          "name": "dblinter",\n          "version": "0.0.0",\n          "informationUri": "https://github.com/decathlon/dblinter"\n        }\n      },\n      "invocations": [\n        {\n          "executionSuccessful": true\n        }\n      ],\n      "results": []\n    }\n  ],\n  "version": "2.1.0",\n  "$schema": "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json"\n}'
     )
 
 

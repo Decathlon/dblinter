@@ -16,10 +16,14 @@ from sarif_om import (
     ToolComponent,
 )
 
+from dblinter import __version__
+
 LOGGER = logging.getLogger("dblinter")
 
 VERSION = "2.1.0"
 SCHEMA = "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json"
+RICH_RULE_MESSAGE_COLOR = "red"
+RICH_RULE_FIX_COLOR = "bright_white"
 
 
 class SarifDocument:
@@ -50,7 +54,7 @@ class SarifDocument:
             driver=ToolComponent(
                 name="dblinter",
                 information_uri="https://github.com/decathlon/dblinter",
-                version="0.1.14",
+                version=__version__,
             )
         )
         invocation = []
@@ -83,19 +87,47 @@ class SarifDocument:
             )
         )
         message = context.message
+        formated_fixes = []
         if message is not None:
             message = message.format(*message_args)
+        else:
+            message = ""
+        if context.fixes is not None:
+            formated_fixes = [fix.format(*message_args) for fix in context.fixes]
         sarif_result = Result(
             rule_id=ruleid,
             message=Message(text=message, arguments=message_args),
-            fixes=context.fixes,
+            fixes=formated_fixes,
             locations=location,
         )
         self.sarif_doc.runs[0].results.append(sarif_result)
         self.sarif_doc.runs[0].invocations[0].end_time_utc = datetime.now(timezone.utc)
 
         if self.quiet_mode is False:
-            rprint(f"[red]{ruleid} {uri} {message}[/red]")
+            rprint(
+                "["
+                + RICH_RULE_MESSAGE_COLOR
+                + "]  ⚠ - "
+                + ruleid
+                + " "
+                + uri
+                + " "
+                + message
+                + "[/"
+                + RICH_RULE_MESSAGE_COLOR
+                + "]"
+            )
+            if context.fixes:
+                for fix in formated_fixes:
+                    rprint(
+                        "["
+                        + RICH_RULE_FIX_COLOR
+                        + "]    ↪ Fix:  "
+                        + fix
+                        + "[/"
+                        + RICH_RULE_FIX_COLOR
+                        + "]"
+                    )
 
     def json_format(self):
         """Tranform a sarif_om object into json
