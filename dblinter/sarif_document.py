@@ -90,6 +90,8 @@ class SarifDocument:
         formated_fixes = []
         if message is not None:
             message = message.format(*message_args)
+        else:
+            message = ""
         if context.fixes is not None:
             formated_fixes = [fix.format(*message_args) for fix in context.fixes]
         sarif_result = Result(

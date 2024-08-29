@@ -97,7 +97,10 @@ def test_add_check_output_no_message(capsys):
     )
     sd.add_check("C001", (), "cluster", context)
     captured = capsys.readouterr()
-    assert captured.out == ""
+    assert (
+        captured.out
+        == "  ⚠ - C001 cluster \n    ↪ Fix:  downsize max_connections or upsize memory.\n"
+    )
 
 
 def test_json_format():
