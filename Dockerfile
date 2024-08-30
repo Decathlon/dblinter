@@ -1,8 +1,8 @@
 FROM python:3.12-slim-bullseye AS base
 
 # Setup env
-ENV LANG C.UTF-8 \
-    LC_ALL C.UTF-8 \
+ENV LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONFAULTHANDLER=1 \
     PYTHONUNBUFFERED=1 \

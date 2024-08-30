@@ -13,7 +13,7 @@ You can use the docker image if you prefer not to install python on your compute
 Launch the docker image
 
 ```sh
-docker run --rm  decathlon/dblinter:latest  --dbname $PGDATABASE --host $PGHOST --user $PGUSER --password $PGPASSWORD --port $PGPORT
+docker run --rm -t decathlon/dblinter:latest  --dbname $PGDATABASE --host $PGHOST --user $PGUSER --password $PGPASSWORD --port $PGPORT
 ```
 
 ## Usage

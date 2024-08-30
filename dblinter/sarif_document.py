@@ -23,7 +23,7 @@ LOGGER = logging.getLogger("dblinter")
 VERSION = "2.1.0"
 SCHEMA = "https://schemastore.azurewebsites.net/schemas/json/sarif-2.1.0-rtm.5.json"
 RICH_RULE_MESSAGE_COLOR = "red"
-RICH_RULE_FIX_COLOR = "bright_white"
+RICH_RULE_FIX_COLOR = "green"
 
 
 class SarifDocument:
