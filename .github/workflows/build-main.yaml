@@ -49,4 +49,4 @@ jobs:
                 uses: docker/build-push-action@v6
                 with:
                     push: true
-                    tags: decathlon/dblinter:latest
+                    tags: decathlon/dblinter:develop
