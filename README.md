@@ -4,6 +4,8 @@ Static conformity is largely used in the dev world but there is no such tool for
 This tool connect to a postgres database to check good practices in schema design and output a file in [Sarif][2] format.
 A configuration file describe the rule to enforce and acceptable threshold
 
+An example of the output is: ![dblinter output](docs/dblinter-output.png)
+
 ## Launch dblinter
 
 ### Docker
@@ -14,6 +16,19 @@ Launch the docker image
 
 ```sh
 docker run --rm -t decathlon/dblinter:latest  --dbname $PGDATABASE --host $PGHOST --user $PGUSER --password $PGPASSWORD --port $PGPORT
+```
+
+## Directly from the source
+
+You can launch dblinter directly from the source code. You will need python and poetry to install the dependencies:
+
+```shell
+# Install poetry
+curl -sSL https://install.python-poetry.org | python3 -
+# Install dependencies
+poetry install --with dev
+# Launch the program
+poetry run python -m dblinter --dbname $PGDATABASE --host $PGHOST --user $PGUSER --password $PGPASSWORD --port $PGPORT
 ```
 
 ## Usage
