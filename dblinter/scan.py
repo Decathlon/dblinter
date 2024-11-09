@@ -317,8 +317,15 @@ def dblinter(
     sarif_document = SarifDocument(describe)
     # quiet_mode is stored in sarif document because we print the output at the same time we build the doc
     sarif_document.quiet_mode = quiet
-    uri=dict(user=user, password=password, host=host, port=port, dbname=dbname, sslmode=sslmode)
-    #uri = f"postgresql://\"{user}:{password}\"@{host}:{port}/{dbname}?sslmode={sslmode}"
+    uri = {
+        "user": user,
+        "password": password,
+        "host": host,
+        "port": port,
+        "dbname": dbname,
+        "sslmode": sslmode,
+    }
+    # uri = f"postgresql://\"{user}:{password}\"@{host}:{port}/{dbname}?sslmode={sslmode}"
     try:
         db = DatabaseConnection(uri)
     except psycopg2.OperationalError as error:
@@ -345,7 +352,14 @@ def dblinter(
         ):
             # Make database check for the specified dbname or all database if connected to postgres or defaultdb database
             try:
-                uri=dict(user=user, password=password, host=host, port=port, dbname=database_to_connect[0], sslmode=sslmode)
+                uri = {
+                    "user": user,
+                    "password": password,
+                    "host": host,
+                    "port": port,
+                    "dbname": dbname,
+                    "sslmode": sslmode,
+                }
                 other_db = DatabaseConnection(uri)
             except psycopg2.OperationalError:
                 sys.exit(1)
