@@ -25,5 +25,12 @@ def get_pg_instance():
         dbname=PG_DBNAME,
         driver=PG_DRIVER,
     ) as postgres:
-        uri = f"postgresql://{postgres.POSTGRES_USER}:{postgres.POSTGRES_PASSWORD}@{postgres.get_container_host_ip()}:{postgres.get_exposed_port('5432')}/{postgres.POSTGRES_DB}"
+        uri = {
+            "user": postgres.POSTGRES_USER,
+            "password": postgres.POSTGRES_PASSWORD,
+            "host": postgres.get_container_host_ip(),
+            "port": postgres.get_exposed_port('5432'),
+            "dbname": postgres.POSTGRES_DB,
+            "sslmode": "disable"
+        }
         yield uri
