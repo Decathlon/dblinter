@@ -45,7 +45,20 @@ class DatabaseConnection:
             Exception: cannot init
         """
         try:
-            self.conn = connect(uri)
+            dbname = uri["dbname"]
+            password = uri["password"]
+            user = uri["user"]
+            host = uri["host"]
+            port = uri["port"]
+            sslmode = uri["sslmode"]
+            self.conn = connect(
+                dbname=dbname,
+                user=user,
+                password=password,
+                host=host,
+                port=port,
+                sslmode=sslmode,
+            )
             self.database = self.conn.get_dsn_parameters()["dbname"]
         except Exception as err:
             log_psycopg2_exception(err)
