@@ -9,6 +9,16 @@ cluster:
       message: "work_mem * max_connections is bigger than ram."
       fixes:
         - downsize max_connections or upsize memory.
+  - name: PgHbaEntriesWithMethodTrustOrPasswordShouldNotExists
+    ruleid: C002
+    enabled: True
+    params:
+      - warning: 1
+    context:
+      desc: This configuration is extremely insecure and should only be used in a controlled, non-production environment for testing purposes. In a production environment, you should use more secure authentication methods such as md5, scram-sha-256, or cert, and restrict access to trusted IP addresses only.
+      message: "{0} entries in pg_hba.conf with trust or password authentication method exceed the warning threshold: {1}."
+      fixes:
+        - change trust or password method in pg_hba.conf.
 base:
   - name: HowManyTableWithoutPrimaryKey
     ruleid: B001
