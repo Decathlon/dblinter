@@ -27,6 +27,7 @@ def test_pg_hba_entries_with_trust_or_password_method_exceed(
         == "6 entries in pg_hba.conf with trust or password authentication method exceed the warning threshold: 1."
     )
 
+
 def test_pg_hba_entries_with_trust_or_password_method_not_exceed(
     postgres_instance_args,
 ) -> None:
@@ -45,6 +46,4 @@ def test_pg_hba_entries_with_trust_or_password_method_not_exceed(
     function_library.get_function_by_function_name(
         "pg_hba_entries_with_trust_or_password_method"
     )(function_library, db, param, context, sarif_document)
-    assert (
-        sarif_document.sarif_doc.runs[0].results == []
-    )
+    assert sarif_document.sarif_doc.runs[0].results == []
