@@ -244,9 +244,9 @@ def test_main_with_schema_only_ok() -> None:
             "user": postgres.POSTGRES_USER,
             "password": postgres.POSTGRES_PASSWORD,
             "host": postgres.get_container_host_ip(),
-            "port": postgres.get_exposed_port('5432'),
+            "port": postgres.get_exposed_port("5432"),
             "dbname": postgres.POSTGRES_DB,
-            "sslmode": "disable"
+            "sslmode": "disable",
         }
         db = DatabaseConnection(uri)
         sarif_document = SarifDocument()
@@ -282,13 +282,13 @@ def test_main_with_schema_only_not_exists() -> None:
         "postgres:14", 5432, "postgres", "postgres", "postgres"
     ) as postgres:
         uri = {
-                    "user": postgres.POSTGRES_USER,
-                    "password": postgres.POSTGRES_PASSWORD,
-                    "host": postgres.get_container_host_ip(),
-                    "port": postgres.get_exposed_port('5432'),
-                    "dbname": postgres.POSTGRES_DB,
-                    "sslmode": "disable"
-                }
+            "user": postgres.POSTGRES_USER,
+            "password": postgres.POSTGRES_PASSWORD,
+            "host": postgres.get_container_host_ip(),
+            "port": postgres.get_exposed_port("5432"),
+            "dbname": postgres.POSTGRES_DB,
+            "sslmode": "disable",
+        }
         function_library = FunctionLibrary()
         db = DatabaseConnection(uri)
         sarif_document = SarifDocument()
@@ -318,13 +318,13 @@ def test_main_with_include_table() -> None:
         "postgres:14", 5432, "postgres", "postgres", "postgres"
     ) as postgres:
         uri = {
-                    "user": postgres.POSTGRES_USER,
-                    "password": postgres.POSTGRES_PASSWORD,
-                    "host": postgres.get_container_host_ip(),
-                    "port": postgres.get_exposed_port('5432'),
-                    "dbname": postgres.POSTGRES_DB,
-                    "sslmode": "disable"
-                }
+            "user": postgres.POSTGRES_USER,
+            "password": postgres.POSTGRES_PASSWORD,
+            "host": postgres.get_container_host_ip(),
+            "port": postgres.get_exposed_port("5432"),
+            "dbname": postgres.POSTGRES_DB,
+            "sslmode": "disable",
+        }
         function_library = FunctionLibrary()
         db = DatabaseConnection(uri)
         sarif_document = SarifDocument()
@@ -373,13 +373,13 @@ def test_main_with_include_table_and_schema() -> None:
         "postgres:14", 5432, "postgres", "postgres", "postgres"
     ) as postgres:
         uri = {
-                    "user": postgres.POSTGRES_USER,
-                    "password": postgres.POSTGRES_PASSWORD,
-                    "host": postgres.get_container_host_ip(),
-                    "port": postgres.get_exposed_port('5432'),
-                    "dbname": postgres.POSTGRES_DB,
-                    "sslmode": "disable"
-                }
+            "user": postgres.POSTGRES_USER,
+            "password": postgres.POSTGRES_PASSWORD,
+            "host": postgres.get_container_host_ip(),
+            "port": postgres.get_exposed_port("5432"),
+            "dbname": postgres.POSTGRES_DB,
+            "sslmode": "disable",
+        }
         function_library = FunctionLibrary()
         db = DatabaseConnection(uri)
         sarif_document = SarifDocument()
@@ -428,13 +428,13 @@ def test_main_with_exclude_table() -> None:
         "postgres:14", 5432, "postgres", "postgres", "postgres"
     ) as postgres:
         uri = {
-                    "user": postgres.POSTGRES_USER,
-                    "password": postgres.POSTGRES_PASSWORD,
-                    "host": postgres.get_container_host_ip(),
-                    "port": postgres.get_exposed_port('5432'),
-                    "dbname": postgres.POSTGRES_DB,
-                    "sslmode": "disable"
-                }
+            "user": postgres.POSTGRES_USER,
+            "password": postgres.POSTGRES_PASSWORD,
+            "host": postgres.get_container_host_ip(),
+            "port": postgres.get_exposed_port("5432"),
+            "dbname": postgres.POSTGRES_DB,
+            "sslmode": "disable",
+        }
         function_library = FunctionLibrary()
         db = DatabaseConnection(uri)
         sarif_document = SarifDocument()
@@ -476,13 +476,13 @@ def test_main_with_schema_and_role_without_default_role_nok() -> None:
         "postgres:14", 5432, "postgres", "postgres", "postgres"
     ) as postgres:
         uri = {
-                    "user": postgres.POSTGRES_USER,
-                    "password": postgres.POSTGRES_PASSWORD,
-                    "host": postgres.get_container_host_ip(),
-                    "port": postgres.get_exposed_port('5432'),
-                    "dbname": postgres.POSTGRES_DB,
-                    "sslmode": "disable"
-                }
+            "user": postgres.POSTGRES_USER,
+            "password": postgres.POSTGRES_PASSWORD,
+            "host": postgres.get_container_host_ip(),
+            "port": postgres.get_exposed_port("5432"),
+            "dbname": postgres.POSTGRES_DB,
+            "sslmode": "disable",
+        }
         function_library = FunctionLibrary()
         db = DatabaseConnection(uri)
         sarif_document = SarifDocument()
@@ -521,13 +521,13 @@ def test_main_with_schema_and_role_without_default_role_ok() -> None:
         "postgres:14", 5432, "postgres", "postgres", "postgres"
     ) as postgres:
         uri = {
-                    "user": postgres.POSTGRES_USER,
-                    "password": postgres.POSTGRES_PASSWORD,
-                    "host": postgres.get_container_host_ip(),
-                    "port": postgres.get_exposed_port('5432'),
-                    "dbname": postgres.POSTGRES_DB,
-                    "sslmode": "disable"
-                }
+            "user": postgres.POSTGRES_USER,
+            "password": postgres.POSTGRES_PASSWORD,
+            "host": postgres.get_container_host_ip(),
+            "port": postgres.get_exposed_port("5432"),
+            "dbname": postgres.POSTGRES_DB,
+            "sslmode": "disable",
+        }
         function_library = FunctionLibrary()
         db = DatabaseConnection(uri)
         sarif_document = SarifDocument()
@@ -565,13 +565,13 @@ def test_main_with_schema_and_role_not_exist_nok() -> None:
         "postgres:14", 5432, "postgres", "postgres", "postgres"
     ) as postgres:
         uri = {
-                    "user": postgres.POSTGRES_USER,
-                    "password": postgres.POSTGRES_PASSWORD,
-                    "host": postgres.get_container_host_ip(),
-                    "port": postgres.get_exposed_port('5432'),
-                    "dbname": postgres.POSTGRES_DB,
-                    "sslmode": "disable"
-                }
+            "user": postgres.POSTGRES_USER,
+            "password": postgres.POSTGRES_PASSWORD,
+            "host": postgres.get_container_host_ip(),
+            "port": postgres.get_exposed_port("5432"),
+            "dbname": postgres.POSTGRES_DB,
+            "sslmode": "disable",
+        }
         function_library = FunctionLibrary()
         db = DatabaseConnection(uri)
         sarif_document = SarifDocument()

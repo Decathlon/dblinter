@@ -29,8 +29,8 @@ def get_pg_instance():
             "user": postgres.POSTGRES_USER,
             "password": postgres.POSTGRES_PASSWORD,
             "host": postgres.get_container_host_ip(),
-            "port": postgres.get_exposed_port('5432'),
+            "port": postgres.get_exposed_port("5432"),
             "dbname": postgres.POSTGRES_DB,
-            "sslmode": "disable"
+            "sslmode": "disable",
         }
         yield uri
