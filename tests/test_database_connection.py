@@ -9,7 +9,15 @@ def test_connection_superuser() -> None:
     with PostgresContainer(
         "postgres:14", 5432, "postgres", "postgres", "postgres"
     ) as postgres:
-        uri = f"postgresql://{postgres.POSTGRES_USER}:{postgres.POSTGRES_PASSWORD}@{postgres.get_container_host_ip()}:{postgres.get_exposed_port('5432')}/{postgres.POSTGRES_DB}"
+        uri = {
+            "user": postgres.POSTGRES_USER,
+            "password": postgres.POSTGRES_PASSWORD,
+            "host": postgres.get_container_host_ip(),
+            "port": postgres.get_exposed_port("5432"),
+            "dbname": postgres.POSTGRES_DB,
+            "sslmode": "disable",
+        }
+        # uri = f"postgresql://{postgres.POSTGRES_USER}:{postgres.POSTGRES_PASSWORD}@{postgres.get_container_host_ip()}:{postgres.get_exposed_port('5432')}/{postgres.POSTGRES_DB}"
         db = DatabaseConnection(uri)
         result = db.query("SELECT rolsuper FROM pg_roles pr WHERE rolname=current_user")
         assert result[0][0] is True
@@ -31,7 +39,14 @@ def test_query_return_exception():
     with PostgresContainer(
         "postgres:14", 5432, "postgres", "postgres", "postgres"
     ) as postgres:
-        uri = f"postgresql://{postgres.POSTGRES_USER}:{postgres.POSTGRES_PASSWORD}@{postgres.get_container_host_ip()}:{postgres.get_exposed_port('5432')}/{postgres.POSTGRES_DB}"
+        uri = {
+            "user": postgres.POSTGRES_USER,
+            "password": postgres.POSTGRES_PASSWORD,
+            "host": postgres.get_container_host_ip(),
+            "port": postgres.get_exposed_port("5432"),
+            "dbname": postgres.POSTGRES_DB,
+            "sslmode": "disable",
+        }
         db = DatabaseConnection(uri)
 
         with pytest.raises(psycopg2.ProgrammingError):
@@ -45,7 +60,14 @@ def test_unable_to_connect():
     with PostgresContainer(
         "postgres:14", 5432, "postgres", "postgres", "postgres"
     ) as postgres:
-        uri = f"postgresql://wrong:{postgres.POSTGRES_PASSWORD}@{postgres.get_container_host_ip()}:{postgres.get_exposed_port('5432')}/{postgres.POSTGRES_DB}"
+        uri = {
+            "user": postgres.POSTGRES_USER,
+            "password": postgres.POSTGRES_PASSWORD,
+            "host": postgres.get_container_host_ip(),
+            "port": postgres.get_exposed_port("5432"),
+            "dbname": postgres.POSTGRES_DB,
+            "sslmode": "",
+        }
         with pytest.raises(psycopg2.OperationalError):
             DatabaseConnection(uri)
 
@@ -54,7 +76,14 @@ def test_query_without_a_connection():
     with PostgresContainer(
         "postgres:14", 5432, "postgres", "postgres", "postgres"
     ) as postgres:
-        uri = f"postgresql://{postgres.POSTGRES_USER}:{postgres.POSTGRES_PASSWORD}@{postgres.get_container_host_ip()}:{postgres.get_exposed_port('5432')}/{postgres.POSTGRES_DB}"
+        uri = {
+            "user": postgres.POSTGRES_USER,
+            "password": postgres.POSTGRES_PASSWORD,
+            "host": postgres.get_container_host_ip(),
+            "port": postgres.get_exposed_port("5432"),
+            "dbname": postgres.POSTGRES_DB,
+            "sslmode": "disable",
+        }
         db = DatabaseConnection(uri)
         db.close()
         with pytest.raises(psycopg2.InterfaceError):
