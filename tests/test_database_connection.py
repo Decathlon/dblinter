@@ -17,7 +17,6 @@ def test_connection_superuser() -> None:
             "dbname": postgres.POSTGRES_DB,
             "sslmode": "disable",
         }
-        # uri = f"postgresql://{postgres.POSTGRES_USER}:{postgres.POSTGRES_PASSWORD}@{postgres.get_container_host_ip()}:{postgres.get_exposed_port('5432')}/{postgres.POSTGRES_DB}"
         db = DatabaseConnection(uri)
         result = db.query("SELECT rolsuper FROM pg_roles pr WHERE rolname=current_user")
         assert result[0][0] is True
