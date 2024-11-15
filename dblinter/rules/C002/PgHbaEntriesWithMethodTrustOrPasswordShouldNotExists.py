@@ -21,4 +21,3 @@ def pg_hba_entries_with_trust_or_password_method(
         sarif_document.add_check(
             self.get_ruleid_from_function_name(), message_args, db.database, context
         )
-
