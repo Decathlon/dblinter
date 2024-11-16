@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from typing import List, Optional, Union
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, RootModel
 
 
 class Context(BaseModel):
@@ -46,6 +46,19 @@ class Rule(BaseModel):
     params: Optional[List[Union[dict[str, str], dict[str, int]]]] = None
     context: Context
 
+class Rules(RootModel):
+    """Model for a list of rule in the configuration file
+
+    """
+    root: Optional[List[Rule]]
+
+    def get_enabled_checks(self) -> List[Rule]:
+        """Get all enabled rules
+
+        Returns:
+            List[Rule]: List of enabled rules
+        """
+        return [rule for rule in self.root if rule.enabled]
 
 class ConfigurationModel(BaseModel):
     """Model for the yaml configuration file
@@ -57,7 +70,8 @@ class ConfigurationModel(BaseModel):
         schema_checks (list) : rules in configuration file at the schema level
     """
 
-    cluster_checks: Optional[List[Rule]] = Field(alias="cluster")
-    base_checks: Optional[List[Rule]] = Field(alias="base")
-    table_checks: Optional[List[Rule]] = Field(alias="table")
-    schema_checks: Optional[List[Rule]] = Field(alias="schema")
+    cluster_checks: Optional[Rules] = Field(alias="cluster")
+    base_checks: Optional[Rules] = Field(alias="base")
+    table_checks: Optional[Rules] = Field(alias="table")
+    schema_checks: Optional[Rules] = Field(alias="schema")
+

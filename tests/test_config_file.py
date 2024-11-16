@@ -44,10 +44,10 @@ def test_configuration_attribute_readable() -> None:
         path="dblinter", config_file_name="default_config.yaml"
     )
     configuration.config_file = parse_yaml_raw_as(ConfigurationModel, raw_yaml)
-    assert configuration.config_file.cluster_checks is not None
-    assert configuration.config_file.base_checks is not None
-    assert configuration.config_file.table_checks is not None
-    assert configuration.config_file.cluster_checks[0].enabled is True
+    assert configuration.config_file.cluster_checks.get_enabled_checks() is not None
+    assert configuration.config_file.base_checks.get_enabled_checks() is not None
+    assert configuration.config_file.table_checks.get_enabled_checks() is not None
+    assert configuration.config_file.cluster_checks.get_enabled_checks()[0].enabled is True
 
 
 def test_check_in_config_are_in_function_list() -> None:

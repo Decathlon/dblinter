@@ -11,7 +11,7 @@ cluster:
         - downsize max_connections or upsize memory.
   - name: PgHbaEntriesWithMethodTrustOrPasswordShouldNotExists
     ruleid: C002
-    enabled: True
+    enabled: False
     params:
       - warning: 1
     context:
