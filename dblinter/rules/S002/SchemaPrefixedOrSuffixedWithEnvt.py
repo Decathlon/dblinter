@@ -12,7 +12,7 @@ def schema_prefixed_or_suffixed_with_envt(
     LOGGER.debug(
         "schema_prefixed_or_suffixed_with_envt for %s in db %s", schema[0], db.database
     )
-    SCHEMA_WITH_ENVT = f"""SELECT count(*)
+    SCHEMA_WITH_ENVT = """SELECT count(*)
         FROM information_schema.schemata
         WHERE schema_name LIKE 'dev_%' OR schema_name LIKE '%_dev'
         OR schema_name LIKE 'prod_%' OR schema_name LIKE '%_prod'
