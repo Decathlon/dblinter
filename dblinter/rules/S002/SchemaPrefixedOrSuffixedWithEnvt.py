@@ -12,19 +12,12 @@ def schema_prefixed_or_suffixed_with_envt(
     LOGGER.debug(
         "schema_prefixed_or_suffixed_with_envt for %s in db %s", schema[0], db.database
     )
-    SCHEMA_WITH_ENVT = """SELECT count(*)
-        FROM information_schema.schemata
-        WHERE schema_name LIKE 'dev_%' OR schema_name LIKE '%_dev'
-        OR schema_name LIKE 'prod_%' OR schema_name LIKE '%_prod'
-        OR schema_name LIKE 'preprod_%' OR schema_name LIKE '%_preprod'
-        OR schema_name LIKE 'staging_%' OR schema_name LIKE '%_staging'
-        OR schema_name LIKE 'stg_%' OR schema_name LIKE '%_stg'
-        OR schema_name LIKE 'sbox_%' OR schema_name LIKE '%_sbox'
-        OR schema_name LIKE 'sandbox_%' OR schema_name LIKE '%_sandbox'"""
-    schema_with_prefix = db.query(SCHEMA_WITH_ENVT)[0][0]
-    uri = f"{db.database}.{schema[0]}"
-    if schema_with_prefix > 0:
-        message_args = (db.database, schema[0])
-        sarif_document.add_check(
-            self.get_ruleid_from_function_name(), message_args, uri, context
-        )
+    ENVT=["dev", "prod", "preprod", "staging", "stg" , "sbox" , "sandbox"]
+    schema_name=schema[0]
+    for env in ENVT:
+        if schema_name.startswith(env) or schema_name.endswith(env):
+            uri = f"{db.database}.{schema_name}"
+            message_args = (env, schema_name)
+            sarif_document.add_check(
+                self.get_ruleid_from_function_name(), message_args, uri, context
+            )
