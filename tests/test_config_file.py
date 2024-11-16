@@ -47,7 +47,9 @@ def test_configuration_attribute_readable() -> None:
     assert configuration.config_file.cluster_checks.get_enabled_checks() is not None
     assert configuration.config_file.base_checks.get_enabled_checks() is not None
     assert configuration.config_file.table_checks.get_enabled_checks() is not None
-    assert configuration.config_file.cluster_checks.get_enabled_checks()[0].enabled is True
+    assert (
+        configuration.config_file.cluster_checks.get_enabled_checks()[0].enabled is True
+    )
 
 
 def test_check_in_config_are_in_function_list() -> None:

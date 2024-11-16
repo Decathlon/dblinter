@@ -46,10 +46,10 @@ class Rule(BaseModel):
     params: Optional[List[Union[dict[str, str], dict[str, int]]]] = None
     context: Context
 
-class Rules(RootModel):
-    """Model for a list of rule in the configuration file
 
-    """
+class Rules(RootModel):
+    """Model for a list of rule in the configuration file"""
+
     root: Optional[List[Rule]]
 
     def get_enabled_checks(self) -> List[Rule]:
@@ -59,6 +59,7 @@ class Rules(RootModel):
             List[Rule]: List of enabled rules
         """
         return [rule for rule in self.root if rule.enabled]
+
 
 class ConfigurationModel(BaseModel):
     """Model for the yaml configuration file
@@ -74,4 +75,3 @@ class ConfigurationModel(BaseModel):
     base_checks: Optional[Rules] = Field(alias="base")
     table_checks: Optional[Rules] = Field(alias="table")
     schema_checks: Optional[Rules] = Field(alias="schema")
-
