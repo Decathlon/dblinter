@@ -63,3 +63,5 @@ def test_schema_with_default_role_granted_on(postgres_instance_args) -> None:
         "schema_with_default_role_not_granted"
     )(function_library, db, param, context, ("schema1", ""), sarif_document)
     assert sarif_document.sarif_doc.runs[0].results == []
+
+

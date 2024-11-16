@@ -17,7 +17,7 @@ def schema_with_default_role_not_granted(
     LEFT JOIN pg_catalog.pg_namespace n ON n.oid = d.defaclnamespace
     WHERE n.nspname='{schema[0]}'"""
     schema_with_default_role = db.query(SCHEMA_WITH_ROLE_NOT_GRANTED)[0][0]
-    uri = "{db.database}.{schema[0]}"
+    uri = f"{db.database}.{schema[0]}"
     if schema_with_default_role == 0:
         message_args = (db.database, schema[0])
         sarif_document.add_check(
