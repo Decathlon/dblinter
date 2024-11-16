@@ -21,7 +21,7 @@ def table_with_fk_in_other_schema(
             WHERE  contype = 'f'
             and conrelid::regclass::text = '{table[0]}.{table[1]}'"""
     table_fk_outside = db.query(TABLE_WITH_FK_OUTSIDE)
-    uri = "{db.database}.{table[0]}.{table[1]}"
+    uri = f"{db.database}.{table[0]}.{table[1]}"
     if table_fk_outside:
         for elt in table_fk_outside:
             target_schema = elt[3].split("REFERENCES")[1].split(".")[0].lstrip()
