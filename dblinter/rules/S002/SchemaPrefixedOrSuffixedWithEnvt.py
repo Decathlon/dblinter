@@ -12,8 +12,8 @@ def schema_prefixed_or_suffixed_with_envt(
     LOGGER.debug(
         "schema_prefixed_or_suffixed_with_envt for %s in db %s", schema[0], db.database
     )
-    ENVT=["dev", "prod", "preprod", "staging", "stg" , "sbox" , "sandbox"]
-    schema_name=schema[0]
+    ENVT = ["dev", "prod", "preprod", "staging", "stg", "sbox", "sandbox"]
+    schema_name = schema[0]
     for env in ENVT:
         if schema_name.startswith(env) or schema_name.endswith(env):
             uri = f"{db.database}.{schema_name}"
