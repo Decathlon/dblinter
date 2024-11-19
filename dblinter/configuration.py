@@ -33,17 +33,6 @@ class Configuration(BaseModel):
 
     config_file: Optional[ConfigurationModel] = None
 
-    def add_if_enabled(self, config_file_check_type, check_list):
-        """Add rule in the check array only if enabled in the configuration file
-
-        Args:
-            config_file_check_type (List): list of rule for 1 rule type
-            check_list (List): Check array
-        """
-        for check in config_file_check_type:
-            if check.get("enabled") is True:
-                check_list.append(check)
-
     def check_in_config_are_in_function_list(self, function_library):
         """Check if the rule in the configuration file exists
 
@@ -55,10 +44,10 @@ class Configuration(BaseModel):
             OSError: A rule in the configuration file does not exist
         """
         all_function_in_config = (
-            self.config_file.cluster_checks
-            + self.config_file.base_checks
-            + self.config_file.table_checks
-            + self.config_file.schema_checks
+            self.config_file.cluster_checks.get_enabled_checks()
+            + self.config_file.base_checks.get_enabled_checks()
+            + self.config_file.table_checks.get_enabled_checks()
+            + self.config_file.schema_checks.get_enabled_checks()
         )
         for function_in_config in all_function_in_config:
             check_is_present = False

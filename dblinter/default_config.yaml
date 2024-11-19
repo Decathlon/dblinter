@@ -188,4 +188,12 @@ schema:
       message: "No default role grantee on schema {0}.{1}. It means that each time a table is created, you must grant it to roles."
       fixes:
         - "add a default privilege=> ALTER DEFAULT PRIVILEGES IN SCHEMA <schema> for user <schema's owner>"
+  - name: SchemaPrefixedOrSuffixedWithEnvt
+    ruleid: S002
+    enabled: True
+    context:
+      desc: The schema is prefixed with one of staging,stg,preprod,prod,sandbox,sbox string. Means that when you refresh your preprod, staging environments from production, you have to rename the target schema from prod_ to stg_ or something like. It is possible, but it is never easy.
+      message: "You should not prefix or suffix the schema name with {0}. You may have difficulties when refreshing environments. Prefer prefix or suffix the database name."
+      fixes:
+        - "Keep the same schema name across environments. Prefer prefix or suffix the database name."
 

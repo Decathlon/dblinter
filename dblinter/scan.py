@@ -33,7 +33,7 @@ def perform_cluster_check(function_library, db, config_file, sarif_document):
         rprint(
             "[" + RICH_CHECK_COLOR + "]perform_cluster_check[/" + RICH_CHECK_COLOR + "]"
         )
-    for check in config_file.cluster_checks:
+    for check in config_file.cluster_checks.get_enabled_checks():
         function_to_launch = function_library.get_function_by_config_name(check.name)
         if function_to_launch:
             function_to_launch(
@@ -65,7 +65,7 @@ def perform_base_check(function_library, db, config_file, sarif_document):
             + RICH_CHECK_COLOR
             + "]"
         )
-    for check in config_file.base_checks:
+    for check in config_file.base_checks.get_enabled_checks():
         function_to_launch = function_library.get_function_by_config_name(check.name)
         if function_to_launch:
             function_to_launch(
@@ -121,7 +121,7 @@ def perform_schema_check(function_library, db, config_file, sarif_document, sche
                 + "]"
             )
         i = i + 1
-        for check in config_file.schema_checks:
+        for check in config_file.schema_checks.get_enabled_checks():
             function_to_launch = function_library.get_function_by_config_name(
                 check.name
             )
@@ -185,7 +185,7 @@ def perform_table_check(
                 + "]"
             )
         i = i + 1
-        for check in config_file.table_checks:
+        for check in config_file.table_checks.get_enabled_checks():
             function_to_launch = function_library.get_function_by_config_name(
                 check.name
             )
