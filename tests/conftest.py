@@ -4,7 +4,7 @@ import pytest
 from testcontainers.core.waiting_utils import wait_container_is_ready
 from testcontainers.postgres import PostgresContainer
 
-PG_IMAGE = "postgres:14"
+PG_IMAGE = "registry.gitlab.com/dalibo/postgresql_anonymizer:latest"
 PG_PORT = 5432
 PG_USER = "postgres"
 PG_PASSWORD = "postgres"

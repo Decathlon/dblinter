@@ -179,6 +179,14 @@ table:
       message: "Uppercase used on table {0}.{1}.{2}."
       fixes:
         - Do not use uppercase for any database objects
+  - name: TableWithSensibleColumn
+    ruleid: T012
+    enabled: True
+    context:
+        desc: Base on the extension anon (https://postgresql-anonymizer.readthedocs.io/en/stable/detection), show sensitive column.
+        message: "{0} have column {1} (category {2}) that can be consider has sensitive. They should be masked, in non-prod environment."
+        fixes:
+        - Install extension anon, and create some masking rules on.
 schema:
   - name: SchemaWithDefaultRoleNotGranted
     ruleid: S001
