@@ -15,7 +15,8 @@ def table_with_sensible_column(
     anon = db.query(CHECK_EXTENSION)[0][0]
     if anon == 0:
         LOGGER.info(
-            "TableWithSensibleColumn is enabled, but anon extension not found. in db %s. see https://postgresql-anonymizer.readthedocs.io to install", db.database
+            "TableWithSensibleColumn is enabled, but anon extension not found. in db %s. see https://postgresql-anonymizer.readthedocs.io to install",
+            db.database,
         )
         return
     SENSITIVE_COLS = f"""with coltable as (SELECT column_name,
@@ -36,11 +37,7 @@ def table_with_sensible_column(
     sensitive_cols = db.query(SENSITIVE_COLS)
     if sensitive_cols:
         for elt in sensitive_cols:
-            message_args = (
-                uri,
-                elt[0],
-                elt[1]
-            )
+            message_args = (uri, elt[0], elt[1])
             sarif_document.add_check(
                 self.get_ruleid_from_function_name(), message_args, uri, context
             )
