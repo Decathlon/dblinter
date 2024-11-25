@@ -11,6 +11,13 @@ def table_with_sensible_column(
     LOGGER.debug(
         "table_with_sensible_column for %s.%s in db %s", table[0], table[1], db.database
     )
+    CHECK_EXTENSION = "select count(*) as nb from pg_extension where extname='anon'"
+    anon = db.query(CHECK_EXTENSION)[0][0]
+    if anon == 0:
+        LOGGER.info(
+            "TableWithSensibleColumn is enabled, but anon extension not found. in db %s. see https://postgresql-anonymizer.readthedocs.io to install", db.database
+        )
+        return
     SENSITIVE_COLS = f"""with coltable as (SELECT column_name,
             identifiers_category from
             anon.detect('en_US')

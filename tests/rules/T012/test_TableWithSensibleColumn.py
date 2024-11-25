@@ -5,6 +5,12 @@ from dblinter.sarif_document import SarifDocument
 
 def test_table_with_sensitive_column(postgres_instance_args) -> None:
     args = postgres_instance_args
+    db = DatabaseConnection(args)
+    CHECK_EXTENSION = "select count(*) as nb from pg_extension where extname='anon'"
+    anon = db.query(CHECK_EXTENSION)[0][0]
+    if anon == 0:
+        assert True
+        return
     context = Context(
         desc="Base on the extension anon (https://postgresql-anonymizer.readthedocs.io/en/stable/detection), show sensitive column.",
         fixes=[
@@ -13,7 +19,6 @@ def test_table_with_sensitive_column(postgres_instance_args) -> None:
         message="{0} have column {1} (category {2}) that can be consider has sensitive. It should be masked for non data-operator users."
     )
     function_library = FunctionLibrary()
-    db = DatabaseConnection(args)
     db.query('select anon.init()')
     db.query('CREATE TABLE test (id integer, creditcard text)')
     sarif_document = SarifDocument()
@@ -31,6 +36,12 @@ def test_table_with_sensitive_column(postgres_instance_args) -> None:
 
 def test_table_without_sensitive_column(postgres_instance_args) -> None:
     args = postgres_instance_args
+    db = DatabaseConnection(args)
+    CHECK_EXTENSION = "select count(*) as nb from pg_extension where extname='anon'"
+    anon = db.query(CHECK_EXTENSION)[0][0]
+    if anon == 0:
+        assert True
+        return
     context = Context(
         desc="Base on the extension anon (https://postgresql-anonymizer.readthedocs.io/en/stable/detection), show sensitive column.",
         fixes=[
@@ -39,7 +50,6 @@ def test_table_without_sensitive_column(postgres_instance_args) -> None:
         message="{0} have column {1} (category {2}) that can be consider has sensitive. It should be masked for non data-operator users."
     )
     function_library = FunctionLibrary()
-    db = DatabaseConnection(args)
     db.query('select anon.init()')
     db.query('CREATE TABLE test (test_id integer, description text)')
     sarif_document = SarifDocument()
