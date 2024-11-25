@@ -184,7 +184,7 @@ table:
     enabled: True
     context:
         desc: Base on the extension anon (https://postgresql-anonymizer.readthedocs.io/en/stable/detection), show sensitive column.
-        message: "{0} have column {1} (category {2}) that can be consider has sensitive. They should be masked, in non-prod environment."
+        message: "{0} have column {1} (category {2}) that can be consider has sensitive. It should be masked for non data-operator users."
         fixes:
         - Install extension anon, and create some masking rules on.
 schema:
