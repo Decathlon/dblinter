@@ -53,10 +53,23 @@ class FunctionLibrary:
         get_ruleid_from_function_name(): examine the call stack to find the called function name and return the coresponding ruleid in the function list
     """
 
-    def __init__(self, path="dblinter"):
+    def __init__(self, path=None):
         # scan the rules directory
+        if path is None:
+            path = ["dblinter"]
+        elif isinstance(path, str):
+            path = [path]
+
         self.functions_list = []
 
+        for base_path in path:
+            if not os.path.exists(f"{base_path}/{RULES_DIRECTORY}"):
+                raise OSError(
+                    f"Rules directory {RULES_DIRECTORY} does not exist in {base_path}"
+                )
+            self._scan_rules_directory(base_path)
+
+    def _scan_rules_directory(self, path: str):
         for rule in os.listdir(f"{path}/{RULES_DIRECTORY}"):
             py_file_detected = 0
             for file in os.listdir(f"{path}/{RULES_DIRECTORY}/{rule}"):
@@ -64,7 +77,7 @@ class FunctionLibrary:
                     py_file_detected = py_file_detected + 1
                     if py_file_detected > 1:
                         raise OSError(
-                            f"There can be only one .py file in folder : dblinter/{RULES_DIRECTORY}/"
+                            f"There can be only one .py file in folder : {path}/{RULES_DIRECTORY}/"
                             + rule
                         )
 

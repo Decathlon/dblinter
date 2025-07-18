@@ -279,6 +279,8 @@ def dblinter(
     schema="",
     exclude="",
     include="",
+    configuration_path=PATH,
+    additional_rule_path=None,
 ):
     """Scan the objects and perform the check
 
@@ -297,6 +299,8 @@ def dblinter(
         exclude (str, optional): Filter table to exclude using ILIKE style pattern matching. Defaults to ""(exclude nothing).
         include (str, optional): Filter table to include using ILIKE style pattern matching. Defaults to ""(include all).
         silent (bool, optional): Quiet mode. Defaults to False.
+        configuration_path (str, optional): Path to the configuration file. Defaults to PATH.
+        additional_rule_path (list, optional): Path to the additional rules file. Defaults to None.
 
     Raises:
         error: Can't connect to database
@@ -305,15 +309,23 @@ def dblinter(
         sarif_om: sarif_document
     """
 
+    all_paths_rules = []
+    if additional_rule_path is None:
+        all_paths_rules = [PATH]
+    else:
+        all_paths_rules.extend(additional_rule_path)
+        # we scan the current module path and the additional rule path
+        all_paths_rules.append(os.path.dirname(__file__))
+
     if filename == "":
         filename = DEFAULT_CONFIG_FILE_NAME
     configuration = Configuration()
     raw_yaml = configuration.read_config_yaml_file(
-        path=PATH, config_file_name=os.path.basename(filename)
+        path=configuration_path, config_file_name=os.path.basename(filename)
     )
     configuration.config_file = parse_yaml_raw_as(ConfigurationModel, raw_yaml)
 
-    function_library = FunctionLibrary(PATH)
+    function_library = FunctionLibrary(all_paths_rules)
     sarif_document = SarifDocument(describe)
     # quiet_mode is stored in sarif document because we print the output at the same time we build the doc
     sarif_document.quiet_mode = quiet

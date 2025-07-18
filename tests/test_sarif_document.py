@@ -1,5 +1,3 @@
-from testcontainers.postgres import PostgresContainer
-
 from dblinter import __version__
 from dblinter.configuration_model import Context
 from dblinter.sarif_document import SarifDocument
@@ -113,32 +111,26 @@ def test_json_format():
     )
 
 
-def test_quiet_mode_on(capsys):
-    with PostgresContainer(
-        "postgres:14", 5432, "postgres", "postgres", "mytestdb"
-    ) as postgres:
-        dblinter(
-            user="postgres",
-            password="postgres",
-            host="localhost",
-            port=postgres.get_exposed_port(5432),
-            dbname="mytestdb",
-            quiet=True,
-        )
-        captured = capsys.readouterr()
-        assert captured.out == ""
+def test_quiet_mode_on(capsys, postgres_instance_args):
+    dblinter(
+        user=postgres_instance_args["user"],
+        password=postgres_instance_args["password"],
+        host=postgres_instance_args["host"],
+        port=postgres_instance_args["port"],
+        dbname=postgres_instance_args["dbname"],
+        quiet=True,
+    )
+    captured = capsys.readouterr()
+    assert captured.out == ""
 
 
-def test_quiet_mode_off(capsys):
-    with PostgresContainer(
-        "postgres:14", 5432, "postgres", "postgres", "mytestdb"
-    ) as postgres:
-        dblinter(
-            user="postgres",
-            password="postgres",
-            host="localhost",
-            port=postgres.get_exposed_port(5432),
-            dbname="mytestdb",
-        )
-        captured = capsys.readouterr()
-        assert captured.out != ""
+def test_quiet_mode_off(capsys, postgres_instance_args):
+    dblinter(
+        user=postgres_instance_args["user"],
+        password=postgres_instance_args["password"],
+        host=postgres_instance_args["host"],
+        port=postgres_instance_args["port"],
+        dbname=postgres_instance_args["dbname"],
+    )
+    captured = capsys.readouterr()
+    assert captured.out != ""
