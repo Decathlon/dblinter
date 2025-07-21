@@ -33,7 +33,7 @@ RUN groupadd -g 1000 -r app \
 COPY --chown=app:app poetry.lock pyproject.toml /app/
 
 RUN poetry config virtualenvs.create false \
-    && poetry install --only main
+    && poetry install --only main --no-interaction --no-root
 
 USER app
 
