@@ -59,3 +59,15 @@ def test_more_than_one_py_file_in_rule_folder(tmp_path, monkeypatch) -> None:
     monkeypatch.chdir(tmp_path)
     with pytest.raises(OSError):
         FunctionLibrary()
+
+
+def test_function_library_init_with_invalid_path():
+    # Should raise OSError if the rules directory does not exist in the given path
+    with pytest.raises(OSError) as excinfo:
+        FunctionLibrary(path="/nonexistent_path")
+    assert "Rules directory" in str(excinfo.value)
+
+
+def test_function_library_init_with_str_path():
+    lib = FunctionLibrary(path="dblinter")
+    assert len(lib.functions_list) > 0
