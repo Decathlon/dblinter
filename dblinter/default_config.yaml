@@ -19,6 +19,16 @@ cluster:
       message: "{0} entries in pg_hba.conf with trust or password authentication method exceed the warning threshold: {1}."
       fixes:
         - change trust or password method in pg_hba.conf.
+  - name: PasswordEncryptionIsMd5
+    ruleid: C003
+    enabled: True
+    params:
+      - warning: 1
+    context:
+      desc: This configuration is not secure anymore and will prevent an upgrade to Postgres 18. Warning, you will need to reset all passwords after this is changed to scram-sha-256.
+      message: "password_encryption is set to md5, this will prevent upgrade to Postgres 18"
+      fixes:
+        - change password_encryption parameter to scram-sha-256. Warning, you will need to reset all passwords after this parameter is updated.
 base:
   - name: HowManyTableWithoutPrimaryKey
     ruleid: B001
