@@ -1,7 +1,6 @@
 import logging
 
 from dblinter.database_connection import DatabaseConnection
-from dblinter.function_library import extract_param
 
 LOGGER = logging.getLogger("dblinter")
 
