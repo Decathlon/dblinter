@@ -36,6 +36,7 @@ postgres12 = PostgresContainer(
 def setup(request):
     return manage_postgres(request, postgres)
 
+
 @pytest.fixture(name="postgres12_instance_args", scope="session", autouse=True)
 def setup12(request):
     return manage_postgres(request, postgres12)

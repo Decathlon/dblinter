@@ -19,14 +19,15 @@ def test_password_encryption_with_md5(
         ],
     )
     sarif_document = SarifDocument()
-    function_library.get_function_by_function_name(
-        "password_encryption_is_md5"
-    )(function_library, db, param, context, sarif_document)
+    function_library.get_function_by_function_name("password_encryption_is_md5")(
+        function_library, db, param, context, sarif_document
+    )
     assert (
-        len(sarif_document.sarif_doc.runs[0].results)>0 and
-        sarif_document.sarif_doc.runs[0].results[0].message.text
+        len(sarif_document.sarif_doc.runs[0].results) > 0
+        and sarif_document.sarif_doc.runs[0].results[0].message.text
         == "password_encryption is set to md5, this will prevent upgrade to Postgres 18"
     )
+
 
 def test_password_encryption_without_md5(
     postgres_instance_args,
@@ -43,9 +44,7 @@ def test_password_encryption_without_md5(
         ],
     )
     sarif_document = SarifDocument()
-    function_library.get_function_by_function_name(
-        "password_encryption_is_md5"
-    )(function_library, db, param, context, sarif_document)
-    assert (
-        len(sarif_document.sarif_doc.runs[0].results)==0
+    function_library.get_function_by_function_name("password_encryption_is_md5")(
+        function_library, db, param, context, sarif_document
     )
+    assert len(sarif_document.sarif_doc.runs[0].results) == 0

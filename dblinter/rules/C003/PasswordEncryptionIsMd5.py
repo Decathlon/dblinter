@@ -19,4 +19,3 @@ def password_encryption_is_md5(
         sarif_document.add_check(
             self.get_ruleid_from_function_name(), message_args, "cluster", context
         )
-
