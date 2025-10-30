@@ -1,8 +1,9 @@
 """Test conftest."""
 
-import pytest
 import time
+
 import psycopg2
+import pytest
 from testcontainers.postgres import PostgresContainer
 
 # PG_IMAGE = "registry.gitlab.com/dalibo/postgresql_anonymizer:latest"
@@ -43,7 +44,7 @@ def wait_for_postgres(uri, timeout=30):
             )
             conn.close()
             return
-        except Exception:
+        except psycopg2.OperationalError:
             time.sleep(1)
     raise RuntimeError("Postgres did not become ready in time")
 
