@@ -26,6 +26,26 @@ def how_many_table_without_primary_key(
     number_of_table_with_pk = db.query(NB_TABLE_WITH_PK)[0][0]
     warning = int(extract_param(param, "warning").split("%")[0])
     uri = db.database
+    # Query to get the list of tables without primary key
+    TABLES_WITHOUT_PK = """
+        SELECT pt.schemaname, pt.tablename
+        FROM pg_catalog.pg_tables pt
+        WHERE pt.schemaname NOT IN ('pg_toast', 'pg_catalog', 'information_schema')
+        AND pt.tablename NOT IN (
+            SELECT DISTINCT(pg_class.relname)
+            FROM pg_index, pg_class, pg_attribute, pg_namespace
+            WHERE indrelid = pg_class.oid AND
+            nspname NOT IN ('pg_toast', 'pg_catalog', 'information_schema') AND
+            pg_class.relnamespace = pg_namespace.oid AND
+            pg_attribute.attrelid = pg_class.oid AND
+            pg_attribute.attnum = any(pg_index.indkey)
+            AND indisprimary
+        )
+    """
+    tables_without_pk_rows = db.query(TABLES_WITHOUT_PK)
+    tables_without_pk_str = ", ".join(
+        f"{row[0]}.{row[1]}" for row in tables_without_pk_rows
+    )
     try:
         if (
             int(
@@ -35,7 +55,11 @@ def how_many_table_without_primary_key(
             )
             > warning
         ):
-            message_args = (total_number_of_table - number_of_table_with_pk, warning)
+            message_args = (
+                total_number_of_table - number_of_table_with_pk,
+                warning,
+                tables_without_pk_str,
+            )
             sarif_document.add_check(
                 self.get_ruleid_from_function_name(), message_args, uri, context
             )

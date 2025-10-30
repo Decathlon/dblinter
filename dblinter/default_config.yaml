@@ -38,7 +38,7 @@ base:
       - error: 70%
     context:
       desc: Count number of tables without primary key.
-      message: "{0} table without primary key exceed the warning threshold: {1}%."
+      message: "{0} table without primary key exceed the warning threshold: {1}%. Table list [{2}]"
       fixes:
         - create a primary key or change warning/error threshold.
   - name: HowManyRedudantIndex
@@ -49,7 +49,7 @@ base:
       - error: 50%
     context:
       desc: Count number of redundant index vs nb index.
-      message: "{0} redundant(s) index exceed the warning threshold: {1}%."
+      message: "{0} redundant(s) index exceed the warning threshold: {1}%. Index list [{2}]"
       fixes:
         - remove duplicated index or change warning/error threshold.
   - name: HowManyTableWithoutIndexOnFk
@@ -60,7 +60,7 @@ base:
       - error: 70%
     context:
       desc: Count number of tables without index on foreign key.
-      message: "{0} table without index on foreign key exceed the warning threshold: {1}%."
+      message: "{0} table without index on foreign key exceed the warning threshold: {1}%. Fk list [{2}]"
       fixes:
         - create a index on foreign key or change warning/error threshold.
   - name: HowManyUnusedIndex
@@ -91,7 +91,7 @@ base:
       - error: 70%
     context:
       desc: Count number of tables with uppercase in name or in columns.
-      message: "{0} tables using uppercase for name or columns exceed the warning threshold: {1}%."
+      message: "{0} tables using uppercase for name or columns exceed the warning threshold: {1}%. Table list [{2}]"
       fixes:
         - Do not use uppercase for any database objects
 table:

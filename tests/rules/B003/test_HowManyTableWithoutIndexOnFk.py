@@ -27,7 +27,7 @@ def test_how_many_table_without_fk_indexed(postgres_instance_args) -> None:
     context = Context(
         desc="Count number of tables without index on foreign key.",
         fixes=["create a index on foreign key or change warning/error threshold."],
-        message="{0} table without index on foreign key exceed the warning threshold: {1}%.",
+        message="{0} table without index on foreign key exceed the warning threshold: {1}%. list [{2}]",
     )
 
     sarif_document = SarifDocument()
@@ -35,8 +35,8 @@ def test_how_many_table_without_fk_indexed(postgres_instance_args) -> None:
         "how_many_table_without_index_on_fk"
     )(function_library, db, param, context, sarif_document)
     assert (
+        "1 table without index on foreign key exceed the warning threshold: 50%." in
         sarif_document.sarif_doc.runs[0].results[0].message.text
-        == "1 table without index on foreign key exceed the warning threshold: 50%."
     )
 
 

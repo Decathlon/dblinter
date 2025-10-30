@@ -15,7 +15,7 @@ def test_how_many_tables_with_uppercase(postgres_instance_args) -> None:
     param = [{"warning": "1%"}]
     context = Context(
         desc="Count number of tables with uppercase characters.",
-        message="{0} table(s) with uppercase characters exceed the warning threshold: {1}%.",
+        message="{0} table(s) with uppercase characters exceed the warning threshold: {1}%. list [{2}]",
         fixes=[
             "Only use lowercase for tables, columns, views, schemas, etc...",
         ],
@@ -25,8 +25,8 @@ def test_how_many_tables_with_uppercase(postgres_instance_args) -> None:
         function_library, db, param, context, sarif_document
     )
     assert (
+        "3 table(s) with uppercase characters exceed the warning threshold: 1%." in
         sarif_document.sarif_doc.runs[0].results[0].message.text
-        == "3 table(s) with uppercase characters exceed the warning threshold: 1%."
     )
 
 
