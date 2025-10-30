@@ -23,9 +23,11 @@ postgres = PostgresContainer(
     driver=PG_DRIVER,
 )
 
+
 @pytest.fixture(name="postgres_instance_args", scope="session", autouse=True)
 def setup(request):
     return manage_postgres(request, postgres)
+
 
 def wait_for_postgres(uri, timeout=30):
     start = time.time()
@@ -45,9 +47,9 @@ def wait_for_postgres(uri, timeout=30):
             time.sleep(1)
     raise RuntimeError("Postgres did not become ready in time")
 
+
 def manage_postgres(request, pg) -> dict[str, str | int]:
     pg.start()
-
 
     def remove_container():
         pg.stop()
@@ -61,5 +63,5 @@ def manage_postgres(request, pg) -> dict[str, str | int]:
         "dbname": pg.dbname,
         "sslmode": "disable",
     }
-    wait_for_postgres(uri,30)
+    wait_for_postgres(uri, 30)
     return uri

@@ -56,6 +56,7 @@ def test_how_many_redundant_index(postgres_instance_args) -> None:
         in sarif_document.sarif_doc.runs[0].results[0].message.text
     )
 
+
 def test_how_many_redundant_index_with_2_redundant_index(
     postgres_instance_args,
 ) -> None:

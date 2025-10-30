@@ -25,8 +25,8 @@ def test_how_many_tables_with_uppercase(postgres_instance_args) -> None:
         function_library, db, param, context, sarif_document
     )
     assert (
-        "3 table(s) with uppercase characters exceed the warning threshold: 1%." in
-        sarif_document.sarif_doc.runs[0].results[0].message.text
+        "3 table(s) with uppercase characters exceed the warning threshold: 1%."
+        in sarif_document.sarif_doc.runs[0].results[0].message.text
     )
 
 

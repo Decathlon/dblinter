@@ -33,13 +33,19 @@ def how_many_tables_with_uppercase(
     warning = int(extract_param(param, "warning").split("%")[0])
     uri = db.database
     tables_with_uppercase_rows = db.query(TABLES_WITH_UPPERCASE)
-    tables_with_uppercase_str = ", ".join(f"{row[0]}.{row[1]}" for row in tables_with_uppercase_rows)
+    tables_with_uppercase_str = ", ".join(
+        f"{row[0]}.{row[1]}" for row in tables_with_uppercase_rows
+    )
     try:
         if (
             int((number_of_table_with_uppercase) / total_number_of_table * 100)
             > warning
         ):
-            message_args = (number_of_table_with_uppercase, warning, tables_with_uppercase_str)
+            message_args = (
+                number_of_table_with_uppercase,
+                warning,
+                tables_with_uppercase_str,
+            )
             sarif_document.add_check(
                 self.get_ruleid_from_function_name(), message_args, uri, context
             )
