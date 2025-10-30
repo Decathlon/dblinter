@@ -8,6 +8,7 @@ from testcontainers.postgres import PostgresContainer
 
 # PG_IMAGE = "registry.gitlab.com/dalibo/postgresql_anonymizer:latest"
 PG_IMAGE = "postgres:14"
+PG_IMAGE_12 = "postgres:12"
 PG_PORT = 5432
 PG_USER = "postgres"
 PG_PASSWORD = "postgres"
@@ -24,10 +25,22 @@ postgres = PostgresContainer(
     driver=PG_DRIVER,
 )
 
+postgres_12 = PostgresContainer(
+    image=PG_IMAGE_12,
+    port=PG_PORT,
+    username=PG_USER,
+    password=PG_PASSWORD,
+    dbname=PG_DBNAME,
+    driver=PG_DRIVER,
+)
 
 @pytest.fixture(name="postgres_instance_args", scope="session", autouse=True)
 def setup(request):
     return manage_postgres(request, postgres)
+
+@pytest.fixture(name="postgres12_instance_args", scope="session", autouse=True)
+def setup12(request):
+    return manage_postgres(request, postgres_12)
 
 
 def wait_for_postgres(uri, timeout=30):
