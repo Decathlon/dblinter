@@ -51,6 +51,7 @@ class DatabaseConnection:
             host = uri["host"]
             port = uri["port"]
             sslmode = uri["sslmode"]
+
             self.conn = connect(
                 dbname=dbname,
                 user=user,
@@ -59,7 +60,9 @@ class DatabaseConnection:
                 port=port,
                 sslmode=sslmode,
             )
+            self.conn.autocommit = False
             self.database = self.conn.get_dsn_parameters()["dbname"]
+
         except Exception as err:
             log_psycopg2_exception(err)
             self.conn = None

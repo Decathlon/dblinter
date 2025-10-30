@@ -14,7 +14,7 @@ def test_how_many_table_without_primary_key(postgres_instance_args) -> None:
     param = [{"warning": "50%"}]
     context = Context(
         desc="Count number of tables without primary key.",
-        message="{0} table without primary key exceed the warning threshold: {1}%.",
+        message="{0} table without primary key exceed the warning threshold: {1}%. Table list [{2}]",
         fixes=[
             "create a index on foreign key or change warning/error threshold.",
         ],
@@ -24,8 +24,8 @@ def test_how_many_table_without_primary_key(postgres_instance_args) -> None:
         "how_many_table_without_primary_key"
     )(function_library, db, param, context, sarif_document)
     assert (
-        sarif_document.sarif_doc.runs[0].results[0].message.text
-        == "2 table without primary key exceed the warning threshold: 50%."
+        "2 table without primary key exceed the warning threshold: 50%."
+        in sarif_document.sarif_doc.runs[0].results[0].message.text
     )
 
 
