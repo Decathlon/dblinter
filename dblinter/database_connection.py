@@ -60,7 +60,7 @@ class DatabaseConnection:
                 port=port,
                 sslmode=sslmode,
             )
-            self.conn.autocommit = True
+            self.conn.autocommit = False
             self.database = self.conn.get_dsn_parameters()["dbname"]
 
         except Exception as err:
