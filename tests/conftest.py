@@ -34,9 +34,11 @@ postgres_12 = PostgresContainer(
     driver=PG_DRIVER,
 )
 
+
 @pytest.fixture(name="postgres_instance_args", scope="session", autouse=True)
 def setup(request):
     return manage_postgres(request, postgres)
+
 
 @pytest.fixture(name="postgres12_instance_args", scope="session", autouse=True)
 def setup12(request):
