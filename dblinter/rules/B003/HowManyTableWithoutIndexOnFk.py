@@ -64,7 +64,7 @@ def how_many_table_without_index_on_fk(
     number_of_table_with_fk_unindexed = db.query(NB_TABLE_WITH_FK_UNINDEXED)[0][0]
     # Build a comma-separated string of table_name (already includes fk_name if query is correct)
     tables_with_fk_unindexed_rows = db.query(TABLES_WITH_FK_UNINDEXED_LIST)
-    tables_with_fk_unindexed_str = ", ".join(
+    tables_with_fk_unindexed_str = "\n".join(
         f"{row[0]}" for row in tables_with_fk_unindexed_rows
     )
     warning = int(extract_param(param, "warning").split("%")[0])

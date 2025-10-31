@@ -33,7 +33,7 @@ def how_many_tables_with_uppercase(
     warning = int(extract_param(param, "warning").split("%")[0])
     uri = db.database
     tables_with_uppercase_rows = db.query(TABLES_WITH_UPPERCASE)
-    tables_with_uppercase_str = ", ".join(
+    tables_with_uppercase_str = "\n".join(
         f"{row[0]}.{row[1]}" for row in tables_with_uppercase_rows
     )
     try:

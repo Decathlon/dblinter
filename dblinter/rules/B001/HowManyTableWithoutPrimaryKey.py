@@ -47,7 +47,7 @@ def how_many_table_without_primary_key(
         )
     """
     tables_without_pk_rows = db.query(TABLES_WITHOUT_PK)
-    tables_without_pk_str = ", ".join(
+    tables_without_pk_str = "\n".join(
         f"{row[0]}.{row[1]}" for row in tables_without_pk_rows
     )
     try:
