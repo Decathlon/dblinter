@@ -90,7 +90,7 @@ def how_many_redundant_index(
         redundant_index_list = db.query(REDUNDANT_INDEX_LIST)
         # Format the list for readability: (schema, table, column, amname, indkey)
         # Build a comma-separated string for each redundant index
-        redundant_index_str = ", ".join(f"{row[0]}" for row in redundant_index_list)
+        redundant_index_str = "\n".join(f"{row[0]}" for row in redundant_index_list)
     except IndexError:
         number_of_redundant_index = 0
         redundant_index_str = ""
