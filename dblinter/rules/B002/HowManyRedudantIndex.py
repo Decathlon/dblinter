@@ -28,7 +28,7 @@ def how_many_redundant_index(
                         WHERE oid = i1.indexrelid
                     )
                     AND pi1.schemaname NOT IN (
-                        'pg_toast', 'pg_catalog', 'information_schema', 'pglinter'
+                        'pg_toast', 'pg_catalog', 'information_schema', '_timescaledb', 'timescaledb'
                     )
             )
     ) redundant"""
@@ -43,7 +43,7 @@ def how_many_redundant_index(
             array_position(ind.indkey, att.attnum) AS column_order
         FROM pg_index ind
         JOIN pg_attribute att ON att.attrelid = ind.indrelid AND att.attnum = ANY(ind.indkey)
-        WHERE ind.indisprimary = FALSE AND NOT ind.indisexclusion
+        WHERE NOT ind.indisexclusion
     ),
     indexed_columns AS (
         -- This CTE aggregates the columns for each index into an ordered string.
@@ -75,22 +75,22 @@ def how_many_redundant_index(
     JOIN table_info ON i1.table_oid = table_info.table_oid
     JOIN pg_namespace ON table_info.relnamespace = pg_namespace.oid
     WHERE
-        pg_namespace.nspname NOT IN ('pg_toast', 'pg_catalog', 'information_schema', 'pglinter')
+        pg_namespace.nspname NOT IN ('pg_toast', 'pg_catalog', 'information_schema', '_timescaledb', 'timescaledb')
         AND redundant_index.oid <> superset_index.oid -- Ensure the indexes are not the same
         -- Checks if the smaller index's column string is a prefix of the larger index's string.
-        --AND i2.indexed_columns_string LIKE i1.indexed_columns_string || '%'
+        AND i2.indexed_columns_string LIKE i1.indexed_columns_string || '%'
     ORDER BY 1
     """
     NB_INDEX = """SELECT count(*) FROM pg_indexes
         WHERE
-        schemaname NOT IN ('pg_toast', 'pg_catalog', 'information_schema')"""
+        schemaname NOT IN ('pg_toast', 'pg_catalog', 'information_schema', '_timescaledb', 'timescaledb')"""
     total_number_of_index = db.query(NB_INDEX)[0][0]
     try:
         number_of_redundant_index = db.query(NB_REDUNDANT_INDEX)[0][0]
         redundant_index_list = db.query(REDUNDANT_INDEX_LIST)
         # Format the list for readability: (schema, table, column, amname, indkey)
         # Build a comma-separated string for each redundant index
-        redundant_index_str = ", ".join(f"{row[0]}" for row in redundant_index_list)
+        redundant_index_str = ";".join(f"{row[0]}" for row in redundant_index_list)
     except IndexError:
         number_of_redundant_index = 0
         redundant_index_str = ""

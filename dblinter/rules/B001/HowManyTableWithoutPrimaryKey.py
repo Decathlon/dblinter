@@ -10,32 +10,36 @@ def how_many_table_without_primary_key(
     self, db: DatabaseConnection, param, context, sarif_document
 ):
     LOGGER.debug("how_many_table_without_primary_key for %s", db.database)
-    NB_TABLE_WITH_PK = """SELECT count(distinct(pg_class.relname))
-        FROM pg_index, pg_class, pg_attribute, pg_namespace
-        WHERE indrelid = pg_class.oid AND
-        nspname NOT IN ('pg_toast', 'pg_catalog', 'information_schema') AND
-        pg_class.relnamespace = pg_namespace.oid AND
-        pg_attribute.attrelid = pg_class.oid AND
-        pg_attribute.attnum = any(pg_index.indkey)
-        AND indisprimary"""
+    NB_TABLE_WITHOUT_PK = """SELECT
+    count(1)
+    FROM
+        pg_class c
+    JOIN
+        pg_namespace n ON n.oid = c.relnamespace
+    LEFT JOIN
+        pg_index i ON i.indrelid = c.oid AND i.indisprimary
+    WHERE
+        n.nspname NOT IN ('pg_catalog', 'information_schema', 'gp_toolkit') -- Exclude system schemas
+        AND c.relkind = 'r' -- Only include regular tables
+        AND i.indrelid IS NULL"""
 
     NB_TABLE_TABLE = """SELECT count(*)
         FROM pg_catalog.pg_tables pt
-        WHERE schemaname NOT IN ('pg_toast', 'pg_catalog', 'information_schema')"""
+        WHERE schemaname NOT IN ('pg_toast', 'pg_catalog', 'information_schema', '_timescaledb', 'timescaledb')"""
     total_number_of_table = db.query(NB_TABLE_TABLE)[0][0]
-    number_of_table_with_pk = db.query(NB_TABLE_WITH_PK)[0][0]
+    number_of_table_without_pk = db.query(NB_TABLE_WITHOUT_PK)[0][0]
     warning = int(extract_param(param, "warning").split("%")[0])
     uri = db.database
     # Query to get the list of tables without primary key
     TABLES_WITHOUT_PK = """
         SELECT pt.schemaname, pt.tablename
         FROM pg_catalog.pg_tables pt
-        WHERE pt.schemaname NOT IN ('pg_toast', 'pg_catalog', 'information_schema')
+        WHERE pt.schemaname NOT IN ('pg_toast', 'pg_catalog', 'information_schema','_timescaledb', 'timescaledb')
         AND pt.tablename NOT IN (
             SELECT DISTINCT(pg_class.relname)
             FROM pg_index, pg_class, pg_attribute, pg_namespace
             WHERE indrelid = pg_class.oid AND
-            nspname NOT IN ('pg_toast', 'pg_catalog', 'information_schema') AND
+            nspname NOT IN ('pg_toast', 'pg_catalog', 'information_schema','_timescaledb', 'timescaledb') AND
             pg_class.relnamespace = pg_namespace.oid AND
             pg_attribute.attrelid = pg_class.oid AND
             pg_attribute.attnum = any(pg_index.indkey)
@@ -43,20 +47,13 @@ def how_many_table_without_primary_key(
         )
     """
     tables_without_pk_rows = db.query(TABLES_WITHOUT_PK)
-    tables_without_pk_str = ", ".join(
+    tables_without_pk_str = ";".join(
         f"{row[0]}.{row[1]}" for row in tables_without_pk_rows
     )
     try:
-        if (
-            int(
-                (total_number_of_table - number_of_table_with_pk)
-                / total_number_of_table
-                * 100
-            )
-            > warning
-        ):
+        if int((number_of_table_without_pk) / total_number_of_table * 100) > warning:
             message_args = (
-                total_number_of_table - number_of_table_with_pk,
+                number_of_table_without_pk,
                 warning,
                 tables_without_pk_str,
             )

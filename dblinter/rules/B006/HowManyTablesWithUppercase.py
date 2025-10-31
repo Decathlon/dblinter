@@ -13,7 +13,7 @@ def how_many_tables_with_uppercase(
 
     NB_TABLE_AND_COLS_WITH_UPPERCASE = """SELECT count(distinct table_name)
         FROM information_schema.columns
-        WHERE table_schema not in ('pg_toast', 'pg_catalog', 'information_schema')
+        WHERE table_schema not in ('pg_toast', 'pg_catalog', 'information_schema', '_timescaledb', 'timescaledb')
         AND (lower(table_name) <> table_name
         OR  lower(column_name) <> column_name)"""
     # Query to get schemaname and tablename for tables with uppercase
@@ -27,13 +27,13 @@ def how_many_tables_with_uppercase(
 
     NB_TABLE_TABLE = """SELECT count(*)
         FROM pg_catalog.pg_tables pt
-        WHERE schemaname NOT IN ('pg_toast', 'pg_catalog', 'information_schema')"""
+        WHERE schemaname NOT IN ('pg_toast', 'pg_catalog', 'information_schema', '_timescaledb', 'timescaledb')"""
     total_number_of_table = db.query(NB_TABLE_TABLE)[0][0]
     number_of_table_with_uppercase = db.query(NB_TABLE_AND_COLS_WITH_UPPERCASE)[0][0]
     warning = int(extract_param(param, "warning").split("%")[0])
     uri = db.database
     tables_with_uppercase_rows = db.query(TABLES_WITH_UPPERCASE)
-    tables_with_uppercase_str = ", ".join(
+    tables_with_uppercase_str = ";".join(
         f"{row[0]}.{row[1]}" for row in tables_with_uppercase_rows
     )
     try:
