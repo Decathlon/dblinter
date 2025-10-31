@@ -43,7 +43,7 @@ def how_many_redundant_index(
             array_position(ind.indkey, att.attnum) AS column_order
         FROM pg_index ind
         JOIN pg_attribute att ON att.attrelid = ind.indrelid AND att.attnum = ANY(ind.indkey)
-        WHERE ind.indisprimary = FALSE AND NOT ind.indisexclusion
+        WHERE ind.indisexclusion
     ),
     indexed_columns AS (
         -- This CTE aggregates the columns for each index into an ordered string.
