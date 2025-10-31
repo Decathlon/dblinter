@@ -78,7 +78,7 @@ def how_many_redundant_index(
         pg_namespace.nspname NOT IN ('pg_toast', 'pg_catalog', 'information_schema', '_timescaledb', 'timescaledb')
         AND redundant_index.oid <> superset_index.oid -- Ensure the indexes are not the same
         -- Checks if the smaller index's column string is a prefix of the larger index's string.
-        --AND i2.indexed_columns_string LIKE i1.indexed_columns_string || '%'
+        AND i2.indexed_columns_string LIKE i1.indexed_columns_string || '%'
     ORDER BY 1
     """
     NB_INDEX = """SELECT count(*) FROM pg_indexes
