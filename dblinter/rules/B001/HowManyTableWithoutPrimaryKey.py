@@ -51,14 +51,7 @@ def how_many_table_without_primary_key(
         f"{row[0]}.{row[1]}" for row in tables_without_pk_rows
     )
     try:
-        if (
-            int(
-                (number_of_table_without_pk)
-                / total_number_of_table
-                * 100
-            )
-            > warning
-        ):
+        if int((number_of_table_without_pk) / total_number_of_table * 100) > warning:
             message_args = (
                 number_of_table_without_pk,
                 warning,
