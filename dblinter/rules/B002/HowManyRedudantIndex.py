@@ -28,7 +28,7 @@ def how_many_redundant_index(
                         WHERE oid = i1.indexrelid
                     )
                     AND pi1.schemaname NOT IN (
-                        'pg_toast', 'pg_catalog', 'information_schema', 'pglinter'
+                        'pg_toast', 'pg_catalog', 'information_schema', '_timescaledb', 'timescaledb'
                     )
             )
     ) redundant"""
@@ -75,7 +75,7 @@ def how_many_redundant_index(
     JOIN table_info ON i1.table_oid = table_info.table_oid
     JOIN pg_namespace ON table_info.relnamespace = pg_namespace.oid
     WHERE
-        pg_namespace.nspname NOT IN ('pg_toast', 'pg_catalog', 'information_schema', 'pglinter')
+        pg_namespace.nspname NOT IN ('pg_toast', 'pg_catalog', 'information_schema', '_timescaledb', 'timescaledb')
         AND redundant_index.oid <> superset_index.oid -- Ensure the indexes are not the same
         -- Checks if the smaller index's column string is a prefix of the larger index's string.
         --AND i2.indexed_columns_string LIKE i1.indexed_columns_string || '%'
@@ -83,7 +83,7 @@ def how_many_redundant_index(
     """
     NB_INDEX = """SELECT count(*) FROM pg_indexes
         WHERE
-        schemaname NOT IN ('pg_toast', 'pg_catalog', 'information_schema')"""
+        schemaname NOT IN ('pg_toast', 'pg_catalog', 'information_schema', '_timescaledb', 'timescaledb')"""
     total_number_of_index = db.query(NB_INDEX)[0][0]
     try:
         number_of_redundant_index = db.query(NB_REDUNDANT_INDEX)[0][0]

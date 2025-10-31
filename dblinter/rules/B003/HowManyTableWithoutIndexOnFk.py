@@ -59,7 +59,7 @@ def how_many_table_without_index_on_fk(
 
     NB_TABLE_TABLE = """SELECT count(*)
         FROM pg_catalog.pg_tables pt
-        WHERE schemaname NOT IN ('pg_toast', 'pg_catalog', 'information_schema')"""
+        WHERE schemaname NOT IN ('pg_toast', 'pg_catalog', 'information_schema','_timescaledb', 'timescaledb')"""
     total_number_of_table = db.query(NB_TABLE_TABLE)[0][0]
     number_of_table_with_fk_unindexed = db.query(NB_TABLE_WITH_FK_UNINDEXED)[0][0]
     # Build a comma-separated string of table_name (already includes fk_name if query is correct)

@@ -13,7 +13,7 @@ def how_many_table_without_primary_key(
     NB_TABLE_WITH_PK = """SELECT count(distinct(pg_class.relname))
         FROM pg_index, pg_class, pg_attribute, pg_namespace
         WHERE indrelid = pg_class.oid AND
-        nspname NOT IN ('pg_toast', 'pg_catalog', 'information_schema') AND
+        nspname NOT IN ('pg_toast', 'pg_catalog', 'information_schema', '_timescaledb', 'timescaledb') AND
         pg_class.relnamespace = pg_namespace.oid AND
         pg_attribute.attrelid = pg_class.oid AND
         pg_attribute.attnum = any(pg_index.indkey)
@@ -21,7 +21,7 @@ def how_many_table_without_primary_key(
 
     NB_TABLE_TABLE = """SELECT count(*)
         FROM pg_catalog.pg_tables pt
-        WHERE schemaname NOT IN ('pg_toast', 'pg_catalog', 'information_schema')"""
+        WHERE schemaname NOT IN ('pg_toast', 'pg_catalog', 'information_schema', '_timescaledb', 'timescaledb')"""
     total_number_of_table = db.query(NB_TABLE_TABLE)[0][0]
     number_of_table_with_pk = db.query(NB_TABLE_WITH_PK)[0][0]
     warning = int(extract_param(param, "warning").split("%")[0])
