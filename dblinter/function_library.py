@@ -14,7 +14,7 @@ EXCLUDED_SCHEMAS = [
     "information_schema",
     "_timescaledb",
     "timescaledb",
-    "pgaudit"
+    "pgaudit",
 ]
 EXCLUDED_SCHEMAS_STR = "', '".join(EXCLUDED_SCHEMAS)
 
