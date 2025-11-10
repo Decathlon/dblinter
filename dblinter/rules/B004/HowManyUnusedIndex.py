@@ -1,7 +1,7 @@
 import logging
 
 from dblinter.database_connection import DatabaseConnection
-from dblinter.function_library import extract_param
+from dblinter.function_library import extract_param,EXCLUDED_SCHEMAS_STR
 
 LOGGER = logging.getLogger("dblinter")
 
@@ -18,13 +18,13 @@ def how_many_table_with_unused_index(
         indexrelname = indexname
         AND
         idstat.schemaname = pg_indexes.schemaname
-        WHERE pg_indexes.schemaname NOT IN ('pg_toast', 'pg_catalog', 'information_schema', '_timescaledb', 'timescaledb') AND
+        WHERE pg_indexes.schemaname NOT IN ('{EXCLUDED_SCHEMAS_STR}') AND
         indexdef !~* 'unique' AND
         pg_relation_size(indexrelid)> {size_mini_bytes}"""
 
-    NB_TABLE_TABLE = """SELECT count(*)
+    NB_TABLE_TABLE = f"""SELECT count(*)
         FROM pg_catalog.pg_tables pt
-        WHERE schemaname NOT IN ('pg_toast', 'pg_catalog', 'information_schema', '_timescaledb', 'timescaledb')"""
+        WHERE schemaname NOT IN ('{EXCLUDED_SCHEMAS_STR}')"""
     total_number_of_table = db.query(NB_TABLE_TABLE)[0][0]
     number_of_table_with_unused_idx = db.query(NB_TABLE_WITH_UNUSED_IDX)[0][0]
     warning = int(extract_param(param, "warning").split("%")[0])

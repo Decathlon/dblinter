@@ -1,7 +1,7 @@
 import logging
 
 from dblinter.database_connection import DatabaseConnection
-from dblinter.function_library import extract_param
+from dblinter.function_library import EXCLUDED_SCHEMAS_STR, extract_param
 
 LOGGER = logging.getLogger("dblinter")
 
@@ -10,7 +10,7 @@ def how_many_table_without_index_on_fk(
     self, db: DatabaseConnection, param, context, sarif_document
 ):
     LOGGER.debug("how_many_table_without_index_on_fk for %s", db.database)
-    NB_TABLE_WITH_FK_UNINDEXED = """
+    NB_TABLE_WITH_FK_UNINDEXED = f"""
         with cte as (
         select
         distinct tc.conrelid::regclass
@@ -19,7 +19,7 @@ def how_many_table_without_index_on_fk(
         join pg_catalog.pg_attribute ta on ta.attnum = tx.attnum and ta.attrelid = tc.conrelid
         inner join pg_class c on c.oid=tc.conrelid
         inner join pg_namespace ns on ns.oid = c.relnamespace
-        where not exists (
+        where ns.nspname not in ('{EXCLUDED_SCHEMAS_STR}') AND not exists (
             select 1 from pg_catalog.pg_index i
             where
             i.indrelid = tc.conrelid and
@@ -31,7 +31,7 @@ def how_many_table_without_index_on_fk(
             tc.confrelid)
             select count(*) from cte"""
     # Query to get the list of tables without index on foreign keys, including fk name
-    TABLES_WITH_FK_UNINDEXED_LIST = """
+    TABLES_WITH_FK_UNINDEXED_LIST = f"""
         with cte as (
         select
         distinct pg_get_userbyid(ns.nspowner)||'.'||tc.conrelid::regclass||'.'||tc.conname as table_name
@@ -40,7 +40,7 @@ def how_many_table_without_index_on_fk(
         join pg_catalog.pg_attribute ta on ta.attnum = tx.attnum and ta.attrelid = tc.conrelid
         inner join pg_class c on c.oid=tc.conrelid
         inner join pg_namespace ns on ns.oid = c.relnamespace
-        where not exists (
+        where ns.nspname not in ('{EXCLUDED_SCHEMAS_STR}') AND not exists (
             select 1 from pg_catalog.pg_index i
             where
             i.indrelid = tc.conrelid and
@@ -57,9 +57,9 @@ def how_many_table_without_index_on_fk(
         select table_name from cte
     """
 
-    NB_TABLE_TABLE = """SELECT count(*)
+    NB_TABLE_TABLE = f"""SELECT count(*)
         FROM pg_catalog.pg_tables pt
-        WHERE schemaname NOT IN ('pg_toast', 'pg_catalog', 'information_schema','_timescaledb', 'timescaledb')"""
+        WHERE schemaname NOT IN ('{EXCLUDED_SCHEMAS_STR}')"""
     total_number_of_table = db.query(NB_TABLE_TABLE)[0][0]
     number_of_table_with_fk_unindexed = db.query(NB_TABLE_WITH_FK_UNINDEXED)[0][0]
     # Build a comma-separated string of table_name (already includes fk_name if query is correct)
