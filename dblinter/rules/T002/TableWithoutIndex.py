@@ -16,7 +16,9 @@ def table_without_index(
     AND schemaname NOT IN ('{}')"""
 
     uri = f"{db.database}.{table[0]}.{table[1]}"
-    index_count = db.query(NB_TABLE_WITHOUT_INDEX.format(table[0], table[1], EXCLUDED_SCHEMAS_STR))[0][0]
+    index_count = db.query(
+        NB_TABLE_WITHOUT_INDEX.format(table[0], table[1], EXCLUDED_SCHEMAS_STR)
+    )[0][0]
     if index_count == 0:
         message_args = (db.database, table[0], table[1])
         sarif_document.add_check(

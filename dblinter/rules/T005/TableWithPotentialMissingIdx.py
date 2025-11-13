@@ -1,7 +1,7 @@
 import logging
 
 from dblinter.database_connection import DatabaseConnection
-from dblinter.function_library import extract_param,EXCLUDED_SCHEMAS_STR
+from dblinter.function_library import EXCLUDED_SCHEMAS_STR, extract_param
 
 LOGGER = logging.getLogger("dblinter")
 
