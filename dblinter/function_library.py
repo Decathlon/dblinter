@@ -12,7 +12,11 @@ EXCLUDED_SCHEMAS = [
     "pg_toast",
     "pg_catalog",
     "information_schema",
-    "_timescaledb",
+    "_timescaledb_catalog",
+    "_timescaledb_config",
+    "_timescaledb_internal",
+    "_timescaledb_cache",
+    "_timescaledb_functions",
     "timescaledb",
     "pgaudit",
 ]
