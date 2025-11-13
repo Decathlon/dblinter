@@ -8,6 +8,20 @@ from typing import List, Union
 LOGGER = logging.getLogger("dblinter")
 RULES_DIRECTORY = "rules"
 
+EXCLUDED_SCHEMAS = [
+    "pg_toast",
+    "pg_catalog",
+    "information_schema",
+    "_timescaledb_catalog",
+    "_timescaledb_config",
+    "_timescaledb_internal",
+    "_timescaledb_cache",
+    "_timescaledb_functions",
+    "timescaledb",
+    "pgaudit",
+]
+EXCLUDED_SCHEMAS_STR = "', '".join(EXCLUDED_SCHEMAS)
+
 
 def extract_param(param: List[dict[str, Union[str, int]]], param_name: str) -> str:
     """Given a param list, return the parameter named param_name
