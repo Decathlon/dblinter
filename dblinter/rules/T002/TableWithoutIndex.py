@@ -13,7 +13,7 @@ def table_without_index(
         "table_without_index for %s.%s in db %s", table[0], table[1], db.database
     )
     NB_TABLE_WITHOUT_INDEX = """SELECT count(*) FROM pg_catalog.pg_indexes WHERE schemaname='{}' AND tablename='{}'
-    AND schemaname NOT ('{}')"""
+    AND schemaname NOT IN ('{}')"""
 
     uri = f"{db.database}.{table[0]}.{table[1]}"
     index_count = db.query(NB_TABLE_WITHOUT_INDEX.format(table[0], table[1], EXCLUDED_SCHEMAS_STR))[0][0]
