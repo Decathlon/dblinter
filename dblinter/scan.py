@@ -13,6 +13,7 @@ from dblinter.configuration_model import ConfigurationModel
 from dblinter.database_connection import DatabaseConnection
 from dblinter.function_library import FunctionLibrary
 from dblinter.sarif_document import SarifDocument
+from dblinter.function_library import EXCLUDED_SCHEMAS_STR
 
 DEFAULT_CONFIG_FILE_NAME = "default_config.yaml"
 PATH = "dblinter"
@@ -98,7 +99,7 @@ def perform_schema_check(function_library, db, config_file, sarif_document, sche
         )
     qry = f"""SELECT schema_name
         FROM information_schema.schemata pt
-        WHERE schema_name NOT IN ('pg_toast', 'pg_catalog', 'information_schema','public')
+        WHERE schema_name NOT IN ('{EXCLUDED_SCHEMAS_STR}')
         AND (schema_name = '{schema}' or '{schema}'='')
         AND schema_name not in ('aiven_extras')
         """
@@ -160,7 +161,7 @@ def perform_table_check(
             + "]"
         )
     qry = f"""SELECT schemaname, tablename
-    FROM pg_catalog.pg_tables pt WHERE schemaname NOT IN ('pg_toast', 'pg_catalog', 'information_schema')
+    FROM pg_catalog.pg_tables pt WHERE schemaname NOT IN ('{EXCLUDED_SCHEMAS_STR}')
     AND (schemaname = '{schema}' or '{schema}'='')
     AND ((tablename ilike '{include}' or '{include}'='') AND (tablename not ilike '{exclude}' or '{exclude}'=''))
     AND (tablename not in ('schema_protection'))"""
