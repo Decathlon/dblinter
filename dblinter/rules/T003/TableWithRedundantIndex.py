@@ -1,6 +1,7 @@
 import logging
 
 from dblinter.database_connection import DatabaseConnection
+from dblinter.function_library import EXCLUDED_SCHEMAS_STR
 
 LOGGER = logging.getLogger("dblinter")
 
@@ -17,7 +18,7 @@ def table_with_redundant_index(
                 pg_namespace ns
         WHERE   c.oid = i.indrelid
         AND     ns.oid = c.relnamespace
-        AND     ns.nspname||'.'||c.relname = '{table[0]}.{table[1]}'
+        AND     ns.nspname||'.'||c.relname = '{table[0]}.{table[1]}' AND ns.nspname NOT IN ('{EXCLUDED_SCHEMAS_STR}')
         GROUP BY indrelid,indkey,ns.nspname,c.relname
         HAVING COUNT(*) > 1;
     """

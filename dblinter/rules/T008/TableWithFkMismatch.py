@@ -1,6 +1,7 @@
 import logging
 
 from dblinter.database_connection import DatabaseConnection
+from dblinter.function_library import EXCLUDED_SCHEMAS_STR
 
 LOGGER = logging.getLogger("dblinter")
 
@@ -42,6 +43,7 @@ def table_with_fk_type_mixmatch(
             where
                 cls.relname = '{table[1]}'
                 and ns.nspname='{table[0]}'
+                and ns.nspname NOT IN ('{EXCLUDED_SCHEMAS_STR}')
                 and contype = 'f'
         ) sub
         join pg_attribute as ta on

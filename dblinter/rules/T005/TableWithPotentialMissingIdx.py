@@ -1,7 +1,7 @@
 import logging
 
 from dblinter.database_connection import DatabaseConnection
-from dblinter.function_library import extract_param
+from dblinter.function_library import extract_param,EXCLUDED_SCHEMAS_STR
 
 LOGGER = logging.getLogger("dblinter")
 
@@ -20,7 +20,7 @@ def table_with_missing_index(
         seq_tup_read / seq_scan AS avg
         FROM pg_stat_user_tables
         WHERE seq_scan > 0 and
-        schemaname='{table[0]}' and relname='{table[1]}'
+        schemaname='{table[0]}' and relname='{table[1]}' and schemaname NOT IN ('{EXCLUDED_SCHEMAS_STR}')
         """
     uri = f"{db.database}.{table[0]}.{table[1]}"
     threshold = int(extract_param(param, "threshold"))

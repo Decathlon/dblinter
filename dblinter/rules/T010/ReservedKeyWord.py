@@ -1,6 +1,7 @@
 import logging
 
 from dblinter.database_connection import DatabaseConnection
+from dblinter.function_library import EXCLUDED_SCHEMAS_STR
 
 LOGGER = logging.getLogger("dblinter")
 
@@ -134,6 +135,7 @@ def reserved_keyword(self, db: DatabaseConnection, _, context, table, sarif_docu
         pn.oid = pc.relnamespace
     WHERE
         pn.nspname = '{table[0]}'
+        AND pn.nspname NOT IN ('{EXCLUDED_SCHEMAS_STR}')
         AND relname = '{table[1]}'
         AND attnum > 0
         """
