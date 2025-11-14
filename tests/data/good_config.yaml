@@ -72,14 +72,6 @@ table:
       message: "No primary key on table {0}.{1}.{2}."
       fixes:
           - create a primary key.
-  - name: TableWithoutIndex
-    ruleid: T002
-    enabled: True
-    context:
-      desc: table without index.
-      message: "No index on table {0}.{1}.{2}."
-      fixes:
-          - check if it's necessary to create index.
   - name: TableWithRedundantIndex
     ruleid: T003
     enabled: True
