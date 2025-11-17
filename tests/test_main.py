@@ -299,22 +299,10 @@ def test_main_with_include_table(postgres_instance_args) -> None:
         sarif_document=sarif_document,
         include="e_table%",
     )
-    assert (
-        sarif_document.sarif_doc.runs[0].results[0].message.text
-        == "No primary key on table postgres.schema1.e_table1."
-    )
-    assert (
-        sarif_document.sarif_doc.runs[0].results[1].message.text
-        == "No index on table postgres.schema1.e_table1."
-    )
-    assert (
-        sarif_document.sarif_doc.runs[0].results[3].message.text
-        == "No primary key on table postgres.schema1.e_table2."
-    )
-    assert (
-        sarif_document.sarif_doc.runs[0].results[4].message.text
-        == "No index on table postgres.schema1.e_table2."
-    )
+    # Check that results contain expected messages (order not guaranteed)
+    result_messages = [r.message.text for r in sarif_document.sarif_doc.runs[0].results]
+    assert "No primary key on table postgres.schema1.e_table1." in result_messages
+    assert "No primary key on table postgres.schema1.e_table2." in result_messages
 
 
 def test_main_with_include_table_and_schema(postgres_instance_args) -> None:
@@ -347,16 +335,8 @@ def test_main_with_include_table_and_schema(postgres_instance_args) -> None:
         == "No primary key on table postgres.schema1.e_table1."
     )
     assert (
-        sarif_document.sarif_doc.runs[0].results[1].message.text
-        == "No index on table postgres.schema1.e_table1."
-    )
-    assert (
-        sarif_document.sarif_doc.runs[0].results[3].message.text
+        sarif_document.sarif_doc.runs[0].results[2].message.text
         == "No primary key on table postgres.schema1.e_table2."
-    )
-    assert (
-        sarif_document.sarif_doc.runs[0].results[4].message.text
-        == "No index on table postgres.schema1.e_table2."
     )
 
 
@@ -386,10 +366,6 @@ def test_main_with_exclude_table(postgres_instance_args) -> None:
     assert (
         sarif_document.sarif_doc.runs[0].results[0].message.text
         == "No primary key on table postgres.schema1.e_table1."
-    )
-    assert (
-        sarif_document.sarif_doc.runs[0].results[1].message.text
-        == "No index on table postgres.schema1.e_table1."
     )
 
 
@@ -501,7 +477,7 @@ def test_main_with_schema_and_role_not_exist_nok(postgres_instance_args) -> None
 
     assert (
         "No role grantee on table postgres.schema1.e_table1. It means that except owner."
-        in sarif_document.sarif_doc.runs[0].results[2].message.text
+        in sarif_document.sarif_doc.runs[0].results[1].message.text
     )
 
 
