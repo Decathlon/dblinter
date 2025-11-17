@@ -28,7 +28,7 @@ jobs:
                     sudo apt install libpq-dev
                     pip install poetry
             -   run: poetry install --with dev
-            -   run: poetry run isort --profile black --diff .
+            -   run: poetry run isort --profile black --diff dblinter/ tests/
             -   run: poetry run black --check .
             -   run: poetry run ruff check .
             -   run: poetry run pylint dblinter tests
