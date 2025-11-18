@@ -81,3 +81,92 @@ def manage_postgres(request, pg) -> dict[str, str | int]:
     }
     wait_for_postgres(uri, 30)
     return uri
+
+
+@pytest.fixture(scope="function", autouse=True)
+def cleanup_database(request):
+    """Clean up database after each test to prevent test pollution.
+
+    This fixture runs automatically for all tests that use postgres databases.
+    """
+    # Only run cleanup if the test uses a postgres fixture
+    uses_pg = "postgres_instance_args" in request.fixturenames
+    uses_pg12 = "postgres12_instance_args" in request.fixturenames
+
+    if not uses_pg and not uses_pg12:
+        yield
+        return
+
+    yield
+    # Cleanup after test
+
+    # Determine which instance to clean
+    instance_args = None
+    if uses_pg:
+        instance_args = request.getfixturevalue("postgres_instance_args")
+    elif uses_pg12:
+        instance_args = request.getfixturevalue("postgres12_instance_args")
+
+    if not instance_args:
+        return
+
+    try:
+        conn = psycopg2.connect(
+            user=instance_args["user"],
+            password=instance_args["password"],
+            host=instance_args["host"],
+            port=instance_args["port"],
+            dbname=instance_args["dbname"],
+            sslmode=instance_args["sslmode"],
+            connect_timeout=10,
+        )
+        conn.autocommit = True
+        cur = conn.cursor()
+
+        # Drop all user-created schemas (except public)
+        cur.execute(
+            """
+            SELECT schema_name
+            FROM information_schema.schemata
+            WHERE schema_name NOT IN ('pg_catalog', 'information_schema', 'public',
+                                      'pg_toast', '_timescaledb_catalog', '_timescaledb_config',
+                                      '_timescaledb_internal', '_timescaledb_cache', '_timescaledb_functions',
+                                      'timescaledb', 'pgaudit')
+        """
+        )
+        schemas = cur.fetchall()
+        for (schema,) in schemas:
+            cur.execute(f'DROP SCHEMA IF EXISTS "{schema}" CASCADE')
+
+        # Drop all tables in public schema
+        cur.execute(
+            """
+            SELECT tablename
+            FROM pg_tables
+            WHERE schemaname = 'public'
+        """
+        )
+        tables = cur.fetchall()
+        for (table,) in tables:
+            cur.execute(f'DROP TABLE IF EXISTS public."{table}" CASCADE')
+
+        # Drop all user-created roles
+        cur.execute(
+            """
+            SELECT rolname
+            FROM pg_roles
+            WHERE rolname NOT LIKE 'pg_%'
+            AND rolname != 'postgres'
+        """
+        )
+        roles = cur.fetchall()
+        for (role,) in roles:
+            # Revoke all privileges first
+            cur.execute(f'REASSIGN OWNED BY "{role}" TO postgres')
+            cur.execute(f'DROP OWNED BY "{role}" CASCADE')
+            cur.execute(f'DROP ROLE IF EXISTS "{role}"')
+
+        cur.close()
+        conn.close()
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        print(f"Cleanup warning: {e}")
