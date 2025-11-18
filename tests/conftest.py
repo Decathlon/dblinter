@@ -168,6 +168,5 @@ def cleanup_database(request):
 
         cur.close()
         conn.close()
-    except Exception as e:
-        # If cleanup fails, log but don't fail the test
+    except Exception as e:  # pylint: disable=broad-exception-caught
         print(f"Cleanup warning: {e}")
