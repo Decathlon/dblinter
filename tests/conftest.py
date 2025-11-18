@@ -124,35 +124,41 @@ def cleanup_database(request):
         cur = conn.cursor()
 
         # Drop all user-created schemas (except public)
-        cur.execute("""
+        cur.execute(
+            """
             SELECT schema_name
             FROM information_schema.schemata
             WHERE schema_name NOT IN ('pg_catalog', 'information_schema', 'public',
                                       'pg_toast', '_timescaledb_catalog', '_timescaledb_config',
                                       '_timescaledb_internal', '_timescaledb_cache', '_timescaledb_functions',
                                       'timescaledb', 'pgaudit')
-        """)
+        """
+        )
         schemas = cur.fetchall()
         for (schema,) in schemas:
             cur.execute(f'DROP SCHEMA IF EXISTS "{schema}" CASCADE')
 
         # Drop all tables in public schema
-        cur.execute("""
+        cur.execute(
+            """
             SELECT tablename
             FROM pg_tables
             WHERE schemaname = 'public'
-        """)
+        """
+        )
         tables = cur.fetchall()
         for (table,) in tables:
             cur.execute(f'DROP TABLE IF EXISTS public."{table}" CASCADE')
 
         # Drop all user-created roles
-        cur.execute("""
+        cur.execute(
+            """
             SELECT rolname
             FROM pg_roles
             WHERE rolname NOT LIKE 'pg_%'
             AND rolname != 'postgres'
-        """)
+        """
+        )
         roles = cur.fetchall()
         for (role,) in roles:
             # Revoke all privileges first
