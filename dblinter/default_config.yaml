@@ -104,7 +104,7 @@ table:
       fixes:
         - create a primary key.
   - name: TableWithRedundantIndex
-    ruleid: T003
+    ruleid: T002
     enabled: True
     context:
       desc: table without duplicated index.
@@ -112,34 +112,15 @@ table:
       fixes:
         - remove duplicated index
   - name: TableWithFkNotIndexed
-    ruleid: T004
+    ruleid: T003
     enabled: True
     context:
       desc: table without index on fk.
-      message: "unindexed fk {0}.{1}.{2}."
+      message: "Unindexed fk {0}.{1}.{2}."
       fixes:
         - "{3}."
-  - name: TableWithPotentialMissingIdx
-    ruleid: T005
-    enabled: True
-    params:
-      - threshold: 1000000
-    context:
-      desc: table with high level of seq scan vs idx scan, base on pg_stat_user_tables.
-      message: "{0} table with seq scan exceed the threshold: {1}."
-      fixes:
-        - ask a dba.
-  - name: TableWithFkOutsideSchema
-    ruleid: T006
-    enabled: True
-    context:
-      desc: table with fk outside its schema
-      message: "fk {0} on {1} is in schema {2}."
-      fixes:
-        - consider rewrite your model.
-        - ask a dba.
   - name: TableWithUnusedIndex
-    ruleid: T007
+    ruleid: T004
     enabled: True
     params:
       - size_mo: 25
@@ -148,6 +129,23 @@ table:
       message: "Index {0} on {1} size {2} Mo seems to be unused (idx_scan=0)."
       fixes:
         - remove unused index or change warning/error threshold.
+  - name: TableWithUppercase
+    ruleid: T006
+    enabled: True
+    context:
+      desc: Table with uppercase in name or in columns.
+      message: "Uppercase used on table {0}.{1}.{2}."
+      fixes:
+        - Do not use uppercase for any database objects
+  - name: TableWithFkOutsideSchema
+    ruleid: T007
+    enabled: True
+    context:
+      desc: table with fk outside its schema
+      message: "fk {0} on {1} is in schema {2}."
+      fixes:
+        - consider rewrite your model.
+        - ask a dba.
   - name: TableWithFkMismatch
     ruleid: T008
     enabled: True
@@ -173,14 +171,16 @@ table:
       message: "{0} {1}.{2}.{3}.{4} violate retricted keyword rule."
       fixes:
         - Rename the object to use a non reserved keyword.
-  - name: TableWithUppercase
+  - name: TableWithPotentialMissingIdx
     ruleid: T011
     enabled: True
+    params:
+      - threshold: 1000000
     context:
-      desc: Table with uppercase in name or in columns.
-      message: "Uppercase used on table {0}.{1}.{2}."
+      desc: table with high level of seq scan vs idx scan, base on pg_stat_user_tables.
+      message: "{0} table with seq scan exceed the threshold: {1}."
       fixes:
-        - Do not use uppercase for any database objects
+        - ask a dba.
   - name: TableWithSensibleColumn
     ruleid: T012
     enabled: True
