@@ -398,7 +398,7 @@ def test_main_with_schema_and_role_without_default_role_nok(
         schema="schema1",
     )
     assert (
-        "No default role grantee on schema postgres.schema1. It means that each time a table is created, you must grant it to roles."
+        "No default role granted on schema postgres.schema1. It means that each time a table is created, you must grant it to roles."
         in sarif_document.sarif_doc.runs[0].results[0].message.text
     )
 
@@ -476,7 +476,7 @@ def test_main_with_schema_and_role_not_exist_nok(postgres_instance_args) -> None
     )
 
     assert (
-        "No role grantee on table postgres.schema1.e_table1. It means that except owner."
+        "No role granted on table postgres.schema1.e_table1."
         in sarif_document.sarif_doc.runs[0].results[1].message.text
     )
 

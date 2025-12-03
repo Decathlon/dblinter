@@ -8,7 +8,7 @@ def test_table_with_fk_mismatch_integer(postgres_instance_args) -> None:
     args = postgres_instance_args
     context = Context(
         desc="Count number of tables without index on foreign key.",
-        fixes=["consider rewrite your model.", "ask a dba."],
+        fixes=["Consider rewrite your model, ask a DBA"],
         message="Type constraint mismatch: {0} on {1} column {2} (type {3}/{4}) ref {5} column {6} type ({7}/{8})",
     )
     param = [{"size_mo": 1}]
