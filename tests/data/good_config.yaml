@@ -6,9 +6,38 @@ cluster:
       - ram: 4000000000
     context:
       desc: Number of cx (max_connections * work_mem) is not greater than memory.
-      message: "work_mem * max_connections is bigger than ram."
+      message: "Work_mem * max_connections is bigger than ram."
       fixes:
-          - downsize max_connections or upsize memory.
+        - Downsize max_connections or upsize memory
+      coef: 1
+      resource_gain: Proper memory configuration prevents OOM kills and ensures stable performance. Optimizes resource usage and eliminates unexpected downtime due to memory exhaustion.
+      risk_impact: Risk of Out-Of-Memory (OOM) errors causing database crashes. System instability, query failures, and potential data corruption during unexpected shutdowns. Critical service interruptions.
+  - name: PgHbaEntriesWithMethodTrustOrPasswordShouldNotExists
+    ruleid: C002
+    enabled: True
+    params:
+      - warning: 1
+    context:
+      desc: This configuration is extremely insecure and should only be used in a controlled, non-production environment for testing purposes. In a production environment, you should use more secure authentication methods such as md5, scram-sha-256, or cert, and restrict access to trusted IP addresses only.
+      message: "{0} entries in pg_hba.conf with trust or password authentication method exceed the warning threshold: {1}."
+      fixes:
+        - Change trust or password method in pg_hba.conf
+      coef: 2
+      resource_gain: Modern authentication methods (scram-sha-256) provide stronger encryption and resistance to replay attacks.
+      risk_impact: "Weak authentication methods (md5, trust) expose credentials to network sniffing and brute-force attacks. Critical security vulnerability enabling unauthorized access, data exfiltration, and compliance failures.\nUpgrading pg can fails"
+  - name: PasswordEncryptionIsMd5
+    ruleid: C003
+    enabled: True
+    params:
+      - warning: 1
+    context:
+      desc: This configuration is not secure anymore and will prevent an upgrade to Postgres 18. Warning, you will need to reset all passwords after this is changed to scram-sha-256.
+      message: "Password_encryption is set to md5, this will prevent upgrade to Postgres 18"
+      fixes:
+        - "Change password_encryption parameter to scram-sha-256. Warning,you will need to reset all passwords after this parameter is updated."
+      coef: 1
+      resource_gain: Upgrading from MD5 to scram-sha-256 provides modern cryptographic protection against rainbow table and brute-force attacks. Improves compliance posture with PCI-DSS and other security standards.
+      risk_impact: MD5 is cryptographically broken and vulnerable to collision attacks. Passwords can be cracked using modern hardware in hours/days. Critical security vulnerability exposing all database access to potential compromise.
 base:
   - name: HowManyTableWithoutPrimaryKey
     ruleid: B001
@@ -18,9 +47,12 @@ base:
       - error: 70%
     context:
       desc: Count number of tables without primary key.
-      message: "{0} table without primary key exceed the warning threshold: {1}%."
+      message: "{0} table without primary key exceed the warning threshold: {1}%. Object list [{2}]"
       fixes:
-          - create a primary key or change warning/error threshold.
+        - Create a primary key
+      coef: 5
+      resource_gain: Primary keys ensure no duplicates are present in the table.
+      risk_impact: Duplicate rows possible, breaking data integrity. Replication failures, inefficient updates requiring full table scans. Severe performance degradation on large tables and logical replication issues.
   - name: HowManyRedudantIndex
     ruleid: B002
     enabled: True
@@ -29,9 +61,12 @@ base:
       - error: 50%
     context:
       desc: Count number of redundant index vs nb index.
-      message: "{0} redundant(s) index exceed the warning threshold: {1}%."
+      message: "{0} redundant(s) index exceed the warning threshold: {1}%. Object list [{2}]"
       fixes:
-          - remove duplicated index or change warning/error threshold.
+        - Remove duplicated index
+      coef: 1
+      resource_gain: Removing redundant indexes reduces storage and improves write performance.
+      risk_impact: Wasted disk space and degraded write performance. Each redundant index adds overhead to INSERT, UPDATE, and DELETE operations, increasing transaction time and maintenance costs.
   - name: HowManyTableWithoutIndexOnFk
     ruleid: B003
     enabled: True
@@ -40,9 +75,12 @@ base:
       - error: 70%
     context:
       desc: Count number of tables without index on foreign key.
-      message: "{0} table without index on foreign key exceed the warning threshold: {1}%."
+      message: "{0} table without index on foreign key exceed the warning threshold: {1}%. Object list [{2}]"
       fixes:
-          - create a index on foreign key or change warning/error threshold.
+        - Create a index on foreign key
+      coef: 3
+      resource_gain: Foreign keys indexes improve JOIN performance and enable efficient cascade operations.
+      risk_impact: Extremely slow JOIN queries and cascade operations. DELETE/UPDATE on parent tables can lock child tables for extended periods, causing application timeouts and severe performance issues.
   - name: HowManyUnusedIndex
     ruleid: B004
     enabled: True
@@ -52,9 +90,12 @@ base:
       - size_mo: 250
     context:
       desc: Count number of unused index vs nb index (base on pg_stat_user_indexes, indexes associated to unique constraints are discard.)
-      message: "{0} table(s) with unused index exceed the warning threshold: {1}%."
+      message: "{0} table(s) with unused index exceed the warning threshold: {1}%. Object list [{2}]"
       fixes:
-          - remove unused index or change warning/error threshold.
+        - Remove unused index
+      coef: 1
+      resource_gain: Removing unused indexes reduces storage, improves INSERT/UPDATE/DELETE performance, and simplifies maintenance. Lower vacuum overhead and faster ANALYZE operations.
+      risk_impact: Unnecessary indexes waste disk space and slow down write operations. Each unused index adds overhead to every data modification, increasing backup size and recovery time.
   - name: UnsecuredPublicSchema
     ruleid: B005
     enabled: True
@@ -62,42 +103,71 @@ base:
       desc: Only authorized users should be allowed to create new objects.
       message: "All schemas on search_path are unsecured, all users can create objects."
       fixes:
-          - REVOKE CREATE ON SCHEMA public FROM PUBLIC
+        - REVOKE CREATE ON SCHEMA public FROM PUBLIC
+      coef: 4
+      resource_gain: Restricting superuser privileges follows principle of least privilege, reducing audit scope. Improves security posture and simplifies compliance reporting.
+      risk_impact: Excessive superuser accounts create critical security vulnerabilities. Single compromised account can bypass all security controls, modify audit logs, and cause catastrophic data breaches. Compliance violations (SOC2, ISO27001).
+  - name: HowManyTablesWithUppercase
+    ruleid: B006
+    enabled: True
+    params:
+      - warning: 10%
+      - error: 70%
+    context:
+      desc: Count number of tables with uppercase in name or in columns.
+      message: "{0} tables using uppercase for name or columns exceed the warning threshold: {1}%. Object list [{2}]"
+      fixes:
+        - Do not use uppercase for any database objects
+      coef: 2
+      resource_gain: Consistent lowercase naming eliminates the need for quoted identifiers in queries. Improves readability and cross-platform compatibility.
+      risk_impact: Mixed-case names require constant double-quoting in all queries, increasing development time and error risk. Makes code harder to maintain and can cause issues when migrating between database systems.
 table:
   - name: TableWithoutPrimaryKey
     ruleid: T001
     enabled: True
     context:
-      desc: table without primary key.
+      desc: Table without primary key.
       message: "No primary key on table {0}.{1}.{2}."
       fixes:
-        - create a primary key.
+        - Create a primary key
+      coef: 5
+      resource_gain: Single-column primary keys simplify indexing strategy and improve UPDATE/DELETE performance. Composite keys appropriate only when representing true compound business keys.
+      risk_impact: Unnecessary composite keys increase index size, slow down queries, and complicate foreign key relationships. May indicate flawed data model requiring refactoring.
   - name: TableWithRedundantIndex
     ruleid: T002
     enabled: True
     context:
-      desc: table without duplicated index.
+      desc: Table with duplicated index.
       message: "{0} redundant(s) index found on {1}.{2} idx {3} column {4}."
       fixes:
-        - remove duplicated index
+        - Remove duplicated index
+      coef: 2
+      resource_gain: Rebuilding invalid indexes restores query performance to optimal levels and prevents query planner errors. Reduces unexpected query failures by 100%.
+      risk_impact: Invalid indexes are silently ignored by the query planner, causing severe performance degradation. Queries that should use the index perform full table scans, potentially timing out in production.
   - name: TableWithFkNotIndexed
     ruleid: T003
     enabled: True
     context:
-      desc: table without index on fk.
-      message: "Unindexed fk {0}.{1}.{2}."
+      desc: Table without index on foreign key.
+      message: "Unindexed foreign key {0}.{1}.{2}."
       fixes:
-        - "{3}."
+        - "{3}"
+      coef: 3
+      resource_gain: Adding indexes on foreign keys dramatically improves JOIN performance and enables efficient CASCADE operations. Essential for referential integrity checks.
+      risk_impact: Missing FK indexes cause slow JOINs and lock contention. DELETE/UPDATE on parent tables can lock entire child tables, causing application timeouts and potential deadlocks in high-concurrency scenarios.
   - name: TableWithUnusedIndex
     ruleid: T004
     enabled: True
     params:
       - size_mo: 25
     context:
-      desc: Table unused index, base on pg_stat_user_indexes, indexes associated to unique constraints are discard.
+      desc: Table unused index, base on pg_stat_user_indexes, indexes associated to unique constraints are discarded.
       message: "Index {0} on {1} size {2} Mo seems to be unused (idx_scan=0)."
       fixes:
-        - remove unused index or change warning/error threshold.
+        - Remove unused index
+      coef: 1
+      resource_gain: Removing unused indexes saves storage and improves write performance. Reduces vacuum time and maintenance overhead.
+      risk_impact: Unnecessary storage consumption and write performance penalties. Every INSERT/UPDATE/DELETE maintains unused indexes, wasting CPU and I/O resources without providing any query benefit.
   - name: TableWithUppercase
     ruleid: T006
     enabled: True
@@ -106,32 +176,42 @@ table:
       message: "Uppercase used on table {0}.{1}.{2}."
       fixes:
         - Do not use uppercase for any database objects
+      coef: 1
+      resource_gain: Consistent lowercase naming eliminates identifier quoting overhead and improves code readability. Reduces development errors and query complexity.
+      risk_impact: Constant need for identifier quoting in queries, increasing complexity and error probability. Cross-platform compatibility issues and higher maintenance burden in application code.
   - name: TableWithFkOutsideSchema
     ruleid: T007
     enabled: True
     context:
-      desc: table with fk outside its schema
-      message: "fk {0} on {1} is in schema {2}."
+      desc: Table with fk outside its schema.
+      message: "Foreign key {0} on {1} is in schema {2}."
       fixes:
-        - consider rewrite your model.
-        - ask a dba.
+        - Consider rewrite your model,ask a DBA
+      coef: 5
+      resource_gain: Keeping foreign keys within the same schema improves modularity and simplifies schema-level backup/restore operations. Enables cleaner application boundaries and easier migrations.
+      risk_impact: Cross-schema foreign keys create tight coupling, making it difficult to independently backup, restore, or migrate schemas. Risk of cascading failures across application boundaries and complex dependency management.
   - name: TableWithFkMismatch
     ruleid: T008
     enabled: True
     context:
-      desc: table with fk mismatch, ex smallint refer to a bigint
+      desc: Table with fk mismatch, ex smallint refer to a bigint.
       message: "Type constraint mismatch: {0} on {1} column {2} (type {3}/{4}) ref {5} column {6} type ({7}/{8})."
       fixes:
-        - consider rewrite your model.
-        - ask a dba.
+        - Consider rewrite your model,ask a DBA
+      coef: 4
+      resource_gain: Matching FK data types prevents implicit casts, improving JOIN performance and reducing index size. Ensures optimal query execution plans.
+      risk_impact: Type mismatches force expensive type conversions on every JOIN, preventing index usage. Can cause performance degradation and potential data range errors if child column can't accommodate parent values.
   - name: TableWithRoleNotGranted
     ruleid: T009
     enabled: True
     context:
       desc: Table has no roles grantee. Meaning that users will need direct access on it (not through a role).
-      message: "No role grantee on table {0}.{1}.{2}. It means that except owner. Others will need a direct grant on this table, not through a role (unusual at dkt)."
+      message: "No role granted on table {0}.{1}.{2}. It means that except owner, others will need a direct grant on this table, not through a role (unusual at dkt)."
       fixes:
-        - create roles (myschema_ro & myschema_rw) and grant it on table with appropriate privileges.
+        - Create roles (myschema_ro & myschema_rw) and grant it on table with appropriate privileges
+      coef: 2
+      resource_gain: Simplified access management through role-based permissions reduces administrative overhead. Easier to manage permissions at scale.
+      risk_impact: Increased maintenance complexity and security risks. Each user requires individual permission management, making audits difficult and increasing the risk of unauthorized access.
   - name: ReservedKeyWord
     ruleid: T010
     enabled: True
@@ -139,31 +219,55 @@ table:
       desc: A table, his column or indexes use reserved keywords.
       message: "{0} {1}.{2}.{3}.{4} violate retricted keyword rule."
       fixes:
-        - Rename the object to use a non reserved keyword.
+        - Rename the object to use a non reserved keyword
+      coef: 1
+      resource_gain: Avoiding reserved keywords prevents query complexity and improves code maintainability. Eliminates need for constant quoting and reduces syntax errors.
+      risk_impact: Increased query complexity requiring constant identifier quoting. Risk of SQL syntax errors, compatibility issues across database versions, and confusion in code maintenance.
   - name: TableWithPotentialMissingIdx
     ruleid: T011
     enabled: True
     params:
       - threshold: 1000000
     context:
-      desc: table with high level of seq scan vs idx scan, base on pg_stat_user_tables.
+      desc: Table with high level of seq scan, base on pg_stat_user_tables.
       message: "{0} table with seq scan exceed the threshold: {1}."
       fixes:
-        - ask a dba.
+        - Ask a DBA
+      coef: 1
+      resource_gain: Adding appropriate indexes to high-seqscan tables will improve query performance and reduces I/O load, freeing resources for other queries.
+      risk_impact: High sequential scan rates indicate missing indexes, causing severe performance issues. Full table scans consume excessive memory and I/O, potentially causing OOM errors and impacting all database users.
   - name: TableWithSensibleColumn
     ruleid: T012
     enabled: True
     context:
-        desc: Base on the extension anon (https://postgresql-anonymizer.readthedocs.io/en/stable/detection), show sensitive column.
-        message: "{0} have column {1} (category {2}) that can be consider has sensitive. It should be masked for non data-operator users."
+        desc: Base on the extension PostgreSQL Anonymizer (https://postgresql-anonymizer.readthedocs.io/en/stable/detection), show sensitive columns.
+        message: "{0} have column {1} (category {2}) that can be considered as sensitive. It should be masked for non data-operator users."
         fixes:
-        - Install extension anon, and create some masking rules on.
+        - Install extension PostgreSQL Anonymizer, and create some masking rules on
+        coef: 1
+        resource_gain: Proper data classification and masking reduces compliance audit time. Enables safe data sharing for development and testing environments.
+        risk_impact: GDPR/CCPA compliance violations risk with fines. Unprotected PII exposure in logs, backups, and non-production environments. Severe reputational damage risk.
 schema:
   - name: SchemaWithDefaultRoleNotGranted
     ruleid: S001
     enabled: True
     context:
       desc: The schema ha no default role. Means that futur table will not be granted through a role. So you will have to re-execute grants on it.
-      message: "No default role grantee on schema {0}.{1}. It means that each time a table is created, you must grant it to roles."
+      message: "No default role granted on schema {0}.{1}. It means that each time a table is created, you must grant it to roles."
       fixes:
-          - "add a default privilege=> ALTER DEFAULT PRIVILEGES IN SCHEMA <schema> for user <schema's owner>"
+        - "Add a default privilege=> ALTER DEFAULT PRIVILEGES IN SCHEMA <schema> for user <schema's owner>"
+      coef: 2
+      resource_gain: New tables automatically receive proper permissions without manual intervention.
+      risk_impact: Manual grant management required for every new table. Risk of missing permissions causing application failures in production. Increased deployment time and potential security gaps.
+  - name: SchemaPrefixedOrSuffixedWithEnvt
+    ruleid: S002
+    enabled: True
+    context:
+      desc: The schema is prefixed with one of staging, stg, preprod, prod, sandbox string. Means that when you refresh your preprod, staging environments from production, you have to rename the target schema from prod_ to stg_ or something like. It is possible, but it is never easy.
+      message: "You should not prefix or suffix the schema name with {0}. You may have difficulties when refreshing environments. Prefer prefix or suffix the database name."
+      fixes:
+        - "Keep the same schema name across environments. Prefer prefix or suffix the database name"
+      coef: 2
+      resource_gain: Environment-neutral naming simplifies refresh operations. Eliminates complex rename scripts.
+      risk_impact: Complex and error-prone environment refresh procedures. Risk of broken references, failed migrations, and extended downtime during refresh operations. Potential data integrity issues.
+

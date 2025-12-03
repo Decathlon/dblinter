@@ -44,7 +44,7 @@ def test_how_many_redundant_index(postgres_instance_args) -> None:
     context = Context(
         desc="Count number of tables without index on foreign key.",
         fixes=["create a index on foreign key or change warning/error threshold."],
-        message="{0} redundant(s) index exceed the warning threshold: {1}%. Index list [{2}]",
+        message="{0} redundant(s) index exceed the warning threshold: {1}%. Object list [{2}]",
     )
 
     sarif_document = SarifDocument()
