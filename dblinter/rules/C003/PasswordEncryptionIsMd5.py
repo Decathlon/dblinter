@@ -6,7 +6,7 @@ LOGGER = logging.getLogger("dblinter")
 
 
 def password_encryption_is_md5(
-    self, db: DatabaseConnection, param, context, sarif_document
+    self, db: DatabaseConnection, _param, context, sarif_document
 ):
     LOGGER.debug("password_encryption_is_md5")
     password_encryption = db.query(

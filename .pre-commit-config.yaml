@@ -4,6 +4,7 @@ repos:
   rev: v4.3.0
   hooks:
   - id: check-yaml # Validates YAML files
+    exclude: 'tests/data/config_file_syntax_error\.yaml'
 - repo: local
   hooks:
   - id: isort
@@ -25,7 +26,7 @@ repos:
     stages: [commit]
     language: system
     types: [python]
-    entry: poetry run ruff .
+    entry: poetry run ruff check .
 
   - id: pylint
     name: pylint
