@@ -12,6 +12,12 @@ def schema_with_default_role_not_granted(
     LOGGER.debug(
         "schema_with_default_role_not_granted for %s in db %s", schema[0], db.database
     )
+
+    # Ignore the 'public' schema
+    if schema[0] == 'public':
+        LOGGER.debug("Skipping 'public' schema")
+        return
+
     SCHEMA_WITH_ROLE_NOT_GRANTED = f"""SELECT count(*)
     FROM pg_catalog.pg_default_acl d
     LEFT JOIN pg_catalog.pg_namespace n ON n.oid = d.defaclnamespace

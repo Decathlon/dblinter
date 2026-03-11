@@ -53,7 +53,7 @@ base:
       coef: 5
       resource_gain: Primary keys ensure no duplicates are present in the table.
       risk_impact: Duplicate rows possible, breaking data integrity. Replication failures, inefficient updates requiring full table scans. Severe performance degradation on large tables and logical replication issues.
-  - name: HowManyRedudantIndex
+  - name: HowManyRedundantIndex
     ruleid: B002
     enabled: True
     params:
@@ -77,9 +77,9 @@ base:
       desc: Count number of tables without index on foreign key.
       message: "{0} table without index on foreign key exceed the warning threshold: {1}%. Object list [{2}]"
       fixes:
-        - Create a index on foreign key
+        - Create an index on foreign key
       coef: 3
-      resource_gain: Foreign keys indexes improve JOIN performance and enable efficient cascade operations.
+      resource_gain: Foreign key indexes improve JOIN performance and enable efficient cascade operations.
       risk_impact: Extremely slow JOIN queries and cascade operations. DELETE/UPDATE on parent tables can lock child tables for extended periods, causing application timeouts and severe performance issues.
   - name: HowManyUnusedIndex
     ruleid: B004
@@ -216,8 +216,8 @@ table:
     ruleid: T010
     enabled: True
     context:
-      desc: A table, his column or indexes use reserved keywords.
-      message: "{0} {1}.{2}.{3}.{4} violate retricted keyword rule."
+      desc: A table, its columns or indexes use reserved keywords.
+      message: "{0} {1}.{2}.{3}.{4} violate restricted keyword rule."
       fixes:
         - Rename the object to use a non reserved keyword
       coef: 1
@@ -234,7 +234,7 @@ table:
       fixes:
         - Ask a DBA
       coef: 1
-      resource_gain: Adding appropriate indexes to high-seqscan tables will improve query performance and reduces I/O load, freeing resources for other queries.
+      resource_gain: Adding appropriate indexes to high-seqscan tables improves query performance and reduces I/O load, freeing resources for other queries.
       risk_impact: High sequential scan rates indicate missing indexes, causing severe performance issues. Full table scans consume excessive memory and I/O, potentially causing OOM errors and impacting all database users.
   - name: TableWithSensibleColumn
     ruleid: T012
@@ -246,13 +246,13 @@ table:
         - Install extension PostgreSQL Anonymizer, and create some masking rules on
         coef: 1
         resource_gain: Proper data classification and masking reduces compliance audit time. Enables safe data sharing for development and testing environments.
-        risk_impact: GDPR/CCPA compliance violations risk with fines. Unprotected PII exposure in logs, backups, and non-production environments. Severe reputational damage risk.
+        risk_impact: Risk of GDPR/CCPA compliance violations with fines. Unprotected PII exposure in logs, backups, and non-production environments. Severe reputational damage risk.
 schema:
   - name: SchemaWithDefaultRoleNotGranted
     ruleid: S001
     enabled: True
     context:
-      desc: The schema ha no default role. Means that futur table will not be granted through a role. So you will have to re-execute grants on it.
+      desc: The schema has no default role. Means that future tables will not be granted through a role. So you will have to re-execute grants on it.
       message: "No default role granted on schema {0}.{1}. It means that each time a table is created, you must grant it to roles."
       fixes:
         - "Add a default privilege=> ALTER DEFAULT PRIVILEGES IN SCHEMA <schema> for user <schema's owner>"
@@ -270,4 +270,3 @@ schema:
       coef: 2
       resource_gain: Environment-neutral naming simplifies refresh operations. Eliminates complex rename scripts.
       risk_impact: Complex and error-prone environment refresh procedures. Risk of broken references, failed migrations, and extended downtime during refresh operations. Potential data integrity issues.
-
