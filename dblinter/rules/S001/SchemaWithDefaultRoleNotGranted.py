@@ -14,7 +14,7 @@ def schema_with_default_role_not_granted(
     )
 
     # Ignore the 'public' schema
-    if schema[0] == 'public':
+    if schema[0] == "public":
         LOGGER.debug("Skipping 'public' schema")
         return
 

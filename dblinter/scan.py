@@ -11,9 +11,8 @@ from rich import print as rprint
 from dblinter.configuration import Configuration
 from dblinter.configuration_model import ConfigurationModel
 from dblinter.database_connection import DatabaseConnection
-from dblinter.function_library import FunctionLibrary
+from dblinter.function_library import EXCLUDED_SCHEMAS_STR, FunctionLibrary
 from dblinter.sarif_document import SarifDocument
-from dblinter.function_library import EXCLUDED_SCHEMAS_STR
 
 DEFAULT_CONFIG_FILE_NAME = "default_config.yaml"
 PATH = "dblinter"
