@@ -108,6 +108,6 @@ schema:
   - name: SchemaWithDefaultRoleNotGranted
     enabled: True
     context:
-      desc: The schema ha no default role. Means that futur table will not be granted through a role. So you will have to re-execute grants on it.
+      desc: The schema has no default role. It means that future tables access will not be granted through a role. So you will have to re-execute grants on it.
       fixes:
         - add a default privilege=> ALTER DEFAULT PRIVILEGES IN SCHEMA <schema> for user <schema's owner> GRANT SELECT ON TABLES TO <schema>_read_only
