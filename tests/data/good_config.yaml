@@ -252,10 +252,10 @@ schema:
     ruleid: S001
     enabled: True
     context:
-      desc: The schema ha no default role. Means that futur table will not be granted through a role. So you will have to re-execute grants on it.
+      desc: The schema has no default role. It means that future tables access will not be granted through a role. So you will have to re-execute grants on it.
       message: "No default role granted on schema {0}.{1}. It means that each time a table is created, you must grant it to roles."
       fixes:
-        - "Add a default privilege=> ALTER DEFAULT PRIVILEGES IN SCHEMA <schema> for user <schema's owner>"
+        - "Add a default privilege => ALTER DEFAULT PRIVILEGES IN SCHEMA <schema> for user <schema's owner>"
       coef: 2
       resource_gain: New tables automatically receive proper permissions without manual intervention.
       risk_impact: Manual grant management required for every new table. Risk of missing permissions causing application failures in production. Increased deployment time and potential security gaps.

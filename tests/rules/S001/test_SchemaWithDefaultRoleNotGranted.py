@@ -19,10 +19,10 @@ def test_schema_without_default_role_granted_on(postgres_instance_args) -> None:
     db.query("CREATE SCHEMA schema1 authorization role1")
     sarif_document = SarifDocument()
     context = Context(
-        desc="The schema ha no default role. Means that futur table will not be granted through a role. So you will have to re-execute grants on it.",
+        desc="The schema has no default role. It means that future tables access will not be granted through a role. So you will have to re-execute grants on it.",
         message="No default role grantee on schema {0}.{1}. It means that each time a table is created, you must grant it to roles.",
         fixes=[
-            "add a default privilege=> ALTER DEFAULT PRIVILEGES IN SCHEMA <schema> for user <schema's owner>",
+            "add a default privilege => ALTER DEFAULT PRIVILEGES IN SCHEMA <schema> for user <schema's owner>",
         ],
     )
 
@@ -53,9 +53,9 @@ def test_schema_with_default_role_granted_on(postgres_instance_args) -> None:
     )
     sarif_document = SarifDocument()
     context = Context(
-        desc="The schema ha no default role. Means that futur table will not be granted through a role. So you will have to re-execute grants on it.",
+        desc="The schema has no default role. It means that future tables access will not be granted through a role. So you will have to re-execute grants on it.",
         fixes=[
-            "add a default privilege=> ALTER DEFAULT PRIVILEGES IN SCHEMA <schema> for user <schema's owner>",
+            "add a default privilege => ALTER DEFAULT PRIVILEGES IN SCHEMA <schema> for user <schema's owner>",
         ],
         message="No default role grantee on schema {0}. It means that each time a table is created, you must grant it to roles.",
     )
