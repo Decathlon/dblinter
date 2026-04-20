@@ -55,7 +55,7 @@ base:
       risk_impact: Duplicate rows possible, breaking data integrity. Replication failures, inefficient updates requiring full table scans. Severe performance degradation on large tables and logical replication issues.
   - name: HowManyRedundantIndex
     ruleid: B002
-    enabled: True
+    enabled: False
     params:
       - warning: 5%
       - error: 50%
@@ -135,7 +135,7 @@ table:
       risk_impact: Unnecessary composite keys increase index size, slow down queries, and complicate foreign key relationships. May indicate flawed data model requiring refactoring.
   - name: TableWithRedundantIndex
     ruleid: T002
-    enabled: True
+    enabled: False
     context:
       desc: Table with duplicated index.
       message: "{0} redundant(s) index found on {1}.{2} idx {3} column {4}."
