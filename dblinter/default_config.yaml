@@ -138,7 +138,7 @@ table:
     enabled: True
     context:
       desc: Table with duplicated index.
-      message: "{0} redundant(s) index found on {1}.{2} idx {3} column {4}."
+      message: "Indexes with the same signature found on table {0}.{1}.{2} (columns: {3}) >> Keep: {4} / Drop: {5}."
       fixes:
         - Remove duplicated index
       coef: 2
