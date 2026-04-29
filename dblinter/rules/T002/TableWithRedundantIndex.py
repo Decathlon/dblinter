@@ -12,48 +12,56 @@ def table_with_redundant_index(
     LOGGER.debug(
         "table_with_redundant_index for %s.%s in db %s", table[0], table[1], db.database
     )
-    REDUNDANT_INDEX_IN_TABLE = f"""SELECT unnest(array_agg(indexrelid::regclass))
-        FROM    pg_index i,
-                pg_class c,
-                pg_namespace ns
-        WHERE   c.oid = i.indrelid
-        AND     ns.oid = c.relnamespace
-        AND     ns.nspname||'.'||c.relname = '{table[0]}.{table[1]}' AND ns.nspname NOT IN ('{EXCLUDED_SCHEMAS_STR}')
-        GROUP BY indrelid,indkey,ns.nspname,c.relname
-        HAVING COUNT(*) > 1;
+    REDUNDANT_INDEX_QUERY = f"""
+        WITH IndexDetails AS (
+            SELECT
+                indrelid::regclass AS table_name,
+                indexrelid::regclass AS index_name,
+                regexp_replace(
+                    pg_get_indexdef(indexrelid),
+                    '.*USING [^ ]+ \\((.*?)\\)',
+                    '\\1'
+                ) AS column_list,
+                indpred AS filter_node
+            FROM pg_index
+            JOIN pg_class c ON c.oid = indrelid
+            JOIN pg_namespace ns ON ns.oid = c.relnamespace
+            WHERE ns.nspname NOT IN ('{EXCLUDED_SCHEMAS_STR}')
+              AND ns.nspname = '{table[0]}'
+              AND c.relname = '{table[1]}'
+        ),
+        DuplicateGroups AS (
+            SELECT
+                table_name,
+                column_list,
+                min(index_name::text) AS primary_index,
+                string_agg(index_name::text, ', ' ORDER BY index_name::text) AS redundant_indexes,
+                count(*) AS total_duplicates
+            FROM IndexDetails
+            GROUP BY table_name, column_list, filter_node
+            HAVING count(*) > 1
+        )
+        SELECT
+            table_name,
+            column_list,
+            primary_index,
+            replace(redundant_indexes, primary_index || ', ', '') AS duplicates_to_drop
+        FROM DuplicateGroups
+        ORDER BY table_name
     """
     uri = f"{db.database}.{table[0]}.{table[1]}"
-    index_list = db.query(REDUNDANT_INDEX_IN_TABLE)
-    if index_list:
-        # We don't use a fstring here because the query is use in a loop and we want to use bind variable mecanism
-        INDEX_DEFINITION = """select
-            i.relname as index_name,
-            array_to_string(array_agg(a.attname), ', ') as column_names
-        from
-            pg_class t,
-            pg_class i,
-            pg_index ix,
-            pg_attribute a
-        where
-            t.oid = ix.indrelid
-            and i.oid = ix.indexrelid
-            and a.attrelid = t.oid
-            and a.attnum = ANY(ix.indkey)
-            and t.relkind = 'r'
-            and i.relname like '{}'
-        group by
-            i.relname
-        """
-        for elt in index_list:
-            idx_name = ""
-            try:
-                idx_name = elt[0].split(".")[1]
-            except IndexError:
-                idx_name = elt[0]
-            index_definition = db.query(INDEX_DEFINITION.format(idx_name))
-            if index_definition:
-                for idx in index_definition:
-                    message_args = (len(index_list), table[0], table[1], idx[0], idx[1])
-                    sarif_document.add_check(
-                        self.get_ruleid_from_function_name(), message_args, uri, context
-                    )
+    results = db.query(REDUNDANT_INDEX_QUERY)
+    if results:
+        for row in results:
+            _, column_list, primary_index, duplicates_to_drop = row
+            message_args = (
+                db.database,
+                table[0],
+                table[1],
+                column_list,
+                primary_index,
+                duplicates_to_drop,
+            )
+            sarif_document.add_check(
+                self.get_ruleid_from_function_name(), message_args, uri, context
+            )
