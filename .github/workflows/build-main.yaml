@@ -14,11 +14,12 @@ jobs:
         runs-on: ubuntu-latest
         timeout-minutes: 60
         steps:
-            -   uses: actions/checkout@v4
+            -   name: Checkout repository
+                uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
                 id: checkout
 
             -   name: Setup Python
-                uses: actions/setup-python@v5
+                uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
                 with:
                     python-version: 3.12
 
@@ -27,26 +28,32 @@ jobs:
                     sudo apt update
                     sudo apt install libpq-dev
                     pip install poetry
+
             -   run: poetry install --with dev
+
             -   run: poetry run isort --profile black --diff dblinter/ tests/
+
             -   run: poetry run black --check .
+
             -   run: poetry run ruff check .
+
             -   run: poetry run pylint dblinter tests
+
             -   run: poetry run pytest --cov=dblinter --cov-report=xml --cov-branch --cov-report term-missing
 
             -   name: Upload results to Codecov
-                uses: codecov/codecov-action@v4
+                uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
                 with:
                     token: ${{ secrets.CODECOV_TOKEN }}
 
             -   name: Login to Docker Hub
-                uses: docker/login-action@v3
+                uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
                 with:
                     username: ${{ secrets.DOCKERHUB_USERNAME }}
                     password: ${{ secrets.DOCKERHUB_TOKEN }}
 
             -   name: Build and push
-                uses: docker/build-push-action@v6
+                uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
                 with:
                     push: true
                     tags: decathlon/dblinter:develop
